@@ -4,8 +4,8 @@ import * as THREE from 'three/webgpu';
 
 import { useTextData } from '~/hooks/useTextData';
 
-const fontUrl = 'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/Lato-Regular-64.fnt';
-const textureUrl = 'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/lato.png';
+const fontUrl = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/Lato-Regular-64.fnt';
+const textureUrl = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/lato.png';
 
 export default function SimpleScene() {
   const { font, texture, isLoading } = useFont(fontUrl, textureUrl);

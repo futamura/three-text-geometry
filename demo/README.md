@@ -5,7 +5,7 @@ This demo project works with [Vite](https://github.com/vitejs/vite).
 ## Clone the repository
 
 ```
-git clone https://github.com/gumob/three-text-geometry.git
+git clone https://github.com/futamura/three-text-geometry.git
 cd three-text-geometry/demo
 ```
 

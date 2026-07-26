@@ -1,11 +1,11 @@
 <!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>three-text-geometry</title><meta name="description" content="Documentation for three-text-geometry"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><link rel="stylesheet" href="assets/custom.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script><script async src="assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">three-text-geometry</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>three-text-geometry</h1></div><div class="tsd-panel tsd-typography"><p><a href="https://badge.fury.io/js/three-text-geometry"><img src="https://img.shields.io/npm/v/three-text-geometry" alt="NPM Version"></a>
-<a href="https://github.com/gumob/three-text-geometry/actions/workflows/main.yaml"><img src="https://github.com/gumob/three-text-geometry/actions/workflows/main.yaml/badge.svg" alt="Main"></a>
-<a href="https://github.com/gumob/three-text-geometry/actions/workflows/develop.yaml"><img src="https://github.com/gumob/three-text-geometry/actions/workflows/develop.yaml/badge.svg" alt="Develop"></a>
-<a href="https://github.com/gumob/three-text-geometry/actions/workflows/github-code-scanning/codeql"><img src="https://github.com/gumob/three-text-geometry/actions/workflows/github-code-scanning/codeql/badge.svg" alt="CodeQL"></a>
-<a href="https://codecov.io/gh/gumob/three-text-geometry"><img src="https://codecov.io/gh/gumob/three-text-geometry/branch/main/graph/badge.svg?token=CL35QZ32NY" alt="codecov"></a>
+<a href="https://github.com/futamura/three-text-geometry/actions/workflows/main.yaml"><img src="https://github.com/futamura/three-text-geometry/actions/workflows/main.yaml/badge.svg" alt="Main"></a>
+<a href="https://github.com/futamura/three-text-geometry/actions/workflows/develop.yaml"><img src="https://github.com/futamura/three-text-geometry/actions/workflows/develop.yaml/badge.svg" alt="Develop"></a>
+<a href="https://github.com/futamura/three-text-geometry/actions/workflows/github-code-scanning/codeql"><img src="https://github.com/futamura/three-text-geometry/actions/workflows/github-code-scanning/codeql/badge.svg" alt="CodeQL"></a>
+<a href="https://codecov.io/gh/futamura/three-text-geometry"><img src="https://codecov.io/gh/futamura/three-text-geometry/branch/main/graph/badge.svg?token=CL35QZ32NY" alt="codecov"></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></p>
 <h1 id="three-text-geometry" class="tsd-anchor-link">three-text-geometry<a href="#three-text-geometry" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
-<img src="https://raw.githubusercontent.com/gumob/three-text-geometry/main/README-assets/demo.gif" alt="demo.gif" style="width:1200px;"/>
+<img src="https://raw.githubusercontent.com/futamura/three-text-geometry/main/README-assets/demo.gif" alt="demo.gif" style="width:1200px;"/>
 <p>The port of the JavaScript versions of <a href="https://github.com/Jam3/three-bmfont-text">three-bmfont-text</a>, <a href="https://github.com/Jam3/layout-bmfont-text">layout-bmfont-text</a>, <a href="https://github.com/Jam3/load-bmfont">load-bmfont</a>, and <a href="https://github.com/mattdesl/word-wrapper">word-wrapper</a> to Pure Typescript, this library enables fast text rendering with Three.js and bitmap font.<br/>
 The difference in rendering speed is noticeable when animations are enabled, and it runs 10x faster than canvas texture based text rendering.</p>
 <p><strong>v4.0</strong> introduces WebGPU support with TSL (Three Shading Language) based node materials that work with both <code>WebGLRenderer</code> and <code>WebGPURenderer</code>.</p>
@@ -33,8 +33,8 @@ The difference in rendering speed is noticeable when animations are enabled, and
 <p><strong>Note:</strong> <code>three</code>, <code>react</code>, and <code>@react-three/fiber</code> are peer dependencies and must be installed alongside <code>three-text-geometry</code>.</p>
 </blockquote>
 <h2 id="usage" class="tsd-anchor-link">Usage<a href="#usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p>For detailed information, read the <a href="https://gumob.github.io/three-text-geometry/">documentation</a> and check the <a href="https://github.com/gumob/three-text-geometry/tree/develop/demo">demo</a>.</p>
-<p><a href="https://gumob.github.io/three-text-geometry/classes/TextGeometry.html"><code>TextGeometry</code></a> supports word wrapping, text aligning, letter spacing, kerning. See <a href="#option-list">the list</a> for all available options.</p>
+<p>For detailed information, read the <a href="https://futamura.github.io/three-text-geometry/">documentation</a> and check the <a href="https://github.com/futamura/three-text-geometry/tree/develop/demo">demo</a>.</p>
+<p><a href="https://futamura.github.io/three-text-geometry/classes/TextGeometry.html"><code>TextGeometry</code></a> supports word wrapping, text aligning, letter spacing, kerning. See <a href="#option-list">the list</a> for all available options.</p>
 <h3 id="react-three-fiber" class="tsd-anchor-link">React Three Fiber<a href="#react-three-fiber" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>three-text-geometry provides first-class support for <a href="https://github.com/pmndrs/react-three-fiber">React Three Fiber</a>.</p>
 <h4 id="setup" class="tsd-anchor-link">Setup<a href="#setup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
@@ -114,14 +114,14 @@ The difference in rendering speed is noticeable when animations are enabled, and
 </table>
 <h3 id="how-to-run-the-demo" class="tsd-anchor-link">How to run the demo<a href="#how-to-run-the-demo" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>The demo is built with React Three Fiber. Clone the repository and run:</p>
-<pre><code><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-0">clone</span><span class="hl-1"> </span><span class="hl-10">https</span><span class="hl-1">:</span><span class="hl-4">//github.com/gumob/three-text-geometry.git</span><br/><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-0">three</span><span class="hl-1">-</span><span class="hl-0">text</span><span class="hl-1">-</span><span class="hl-0">geometry</span><span class="hl-1">/</span><span class="hl-0">demo</span><br/><span class="hl-0">corepack</span><span class="hl-1"> </span><span class="hl-0">enable</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-0">install</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-0">dev</span>
+<pre><code><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-0">clone</span><span class="hl-1"> </span><span class="hl-10">https</span><span class="hl-1">:</span><span class="hl-4">//github.com/futamura/three-text-geometry.git</span><br/><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-0">three</span><span class="hl-1">-</span><span class="hl-0">text</span><span class="hl-1">-</span><span class="hl-0">geometry</span><span class="hl-1">/</span><span class="hl-0">demo</span><br/><span class="hl-0">corepack</span><span class="hl-1"> </span><span class="hl-0">enable</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-0">install</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-0">dev</span>
 </code><button>Copy</button></pre>
 
 <h3 id="screen-coordinate-system-and-threejs-coordinate-system" class="tsd-anchor-link">Screen coordinate system and Three.js coordinate system<a href="#screen-coordinate-system-and-threejs-coordinate-system" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>TextGeometry places text based on the screen coordinate system.
 Therefore, when <a href="https://threejs.org/docs/#api/en/objects/Mesh"><code>THREE.Mesh</code></a> is added to the scene, the text will be placed inverted when viewed from the positive direction of the Z axis.
 To make the text visible from the positive z-axis, you need apply transformation.</p>
-<p><img src="https://raw.githubusercontent.com/gumob/three-text-geometry/main/README-assets/coord-conversion.webp" alt="coord-conversion.webp"></p>
+<p><img src="https://raw.githubusercontent.com/futamura/three-text-geometry/main/README-assets/coord-conversion.webp" alt="coord-conversion.webp"></p>
 <h4 id="bmfontparser-interface-supports-json-xml-acii-and-binary-fromat" class="tsd-anchor-link">BMFontParser interface supports JSON, XML, ACII, and Binary fromat<a href="#bmfontparser-interface-supports-json-xml-acii-and-binary-fromat" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
 <p>Parse font data in JSON format</p>
 <pre><code class="TypeScript"><span class="hl-2">import</span><span class="hl-1"> { </span><span class="hl-0">BMFontJsonParser</span><span class="hl-1"> } </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;three-text-geometry&#39;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">font</span><span class="hl-1">: </span><span class="hl-9">BMFont</span><span class="hl-1"> = </span><span class="hl-5">new</span><span class="hl-1"> </span><span class="hl-7">BMFontJsonParser</span><span class="hl-1">().</span><span class="hl-7">parse</span><span class="hl-1">(</span><span class="hl-4">/** `string` or `object` data JSON format */</span><span class="hl-1">)</span>
@@ -154,7 +154,7 @@ To make the text visible from the positive z-axis, you need apply transformation
 <tbody>
 <tr>
 <td><strong>font</strong></td>
-<td style="text-align:center"><a href="https://gumob.github.io/three-text-geometry/interfaces/BMFont.html"><code>BMFont</code></a></td>
+<td style="text-align:center"><a href="https://futamura.github.io/three-text-geometry/interfaces/BMFont.html"><code>BMFont</code></a></td>
 <td>The BMFont definition which holds chars, kernings, etc</td>
 <td style="text-align:center">undefined</td>
 <td style="text-align:center">✔</td>
@@ -162,22 +162,22 @@ To make the text visible from the positive z-axis, you need apply transformation
 <tr>
 <td><strong>width</strong></td>
 <td style="text-align:center"><code>number</code></td>
-<td>The desired width of the text box, causes word-wrapping and clipping in <a href="https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html"><code>WordWrapMode</code></a> mode. Leave as undefined to remove word-wrapping (default behaviour)</td>
+<td>The desired width of the text box, causes word-wrapping and clipping in <a href="https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html"><code>WordWrapMode</code></a> mode. Leave as undefined to remove word-wrapping (default behaviour)</td>
 <td style="text-align:center">undefined</td>
 <td style="text-align:center"></td>
 </tr>
 <tr>
 <td><strong>mode</strong></td>
-<td style="text-align:center"><a href="https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html"><code>WordWrapMode</code></a></td>
-<td>A mode for word-wrapper; can be <a href="https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html#Pre"><code>WordWrapMode.Pre</code></a> (maintain spacing), or <a href="https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html#NoWrap"><code>WordWrapMode.NoWrap</code></a> (collapse whitespace but only break on newline characters), otherwise assumes normal word-wrap behaviour (collapse whitespace, break at width or newlines)</td>
+<td style="text-align:center"><a href="https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html"><code>WordWrapMode</code></a></td>
+<td>A mode for word-wrapper; can be <a href="https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html#Pre"><code>WordWrapMode.Pre</code></a> (maintain spacing), or <a href="https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html#NoWrap"><code>WordWrapMode.NoWrap</code></a> (collapse whitespace but only break on newline characters), otherwise assumes normal word-wrap behaviour (collapse whitespace, break at width or newlines)</td>
 <td style="text-align:center">undefined</td>
 <td style="text-align:center"></td>
 </tr>
 <tr>
 <td><strong>align</strong></td>
-<td style="text-align:center"><a href="https://gumob.github.io/three-text-geometry/enums/TextAlign.html"><code>TextAlign</code></a></td>
-<td>This can be <a href="https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Left"><code>TextAlign.left</code></a>, <a href="https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Center"><code>TextAlign.center</code></a> or <a href="https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Right"><code>TextAlign.right</code></a></td>
-<td style="text-align:center"><a href="https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Left"><code>TextAlign.left</code></a></td>
+<td style="text-align:center"><a href="https://futamura.github.io/three-text-geometry/enums/TextAlign.html"><code>TextAlign</code></a></td>
+<td>This can be <a href="https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Left"><code>TextAlign.left</code></a>, <a href="https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Center"><code>TextAlign.center</code></a> or <a href="https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Right"><code>TextAlign.right</code></a></td>
+<td style="text-align:center"><a href="https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Left"><code>TextAlign.left</code></a></td>
 <td style="text-align:center"></td>
 </tr>
 <tr>
@@ -191,7 +191,7 @@ To make the text visible from the positive z-axis, you need apply transformation
 <td><strong>lineHeight</strong></td>
 <td style="text-align:center"><code>number</code></td>
 <td>The line height in pixels</td>
-<td style="text-align:center"><a href="https://gumob.github.io/three-text-geometry/interfaces/BMFontCommon.html#lineHeight"><code>font.common.lineHeight</code></a></td>
+<td style="text-align:center"><a href="https://futamura.github.io/three-text-geometry/interfaces/BMFontCommon.html#lineHeight"><code>font.common.lineHeight</code></a></td>
 <td style="text-align:center"></td>
 </tr>
 <tr>
@@ -212,7 +212,7 @@ To make the text visible from the positive z-axis, you need apply transformation
 <td><strong>end</strong></td>
 <td style="text-align:center"><code>number</code></td>
 <td>The ending index (exclusive) into the text to layout</td>
-<td style="text-align:center"><a href="https://gumob.github.io/three-text-geometry/classes/TextGeometry.html#constructor"><code>text.length</code></a></td>
+<td style="text-align:center"><a href="https://futamura.github.io/three-text-geometry/classes/TextGeometry.html#constructor"><code>text.length</code></a></td>
 <td style="text-align:center"></td>
 </tr>
 <tr>
