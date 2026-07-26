@@ -5,11 +5,11 @@ import * as THREE from 'three/webgpu';
 
 import { useTextData } from '~/hooks/useTextData';
 
-const fontUrl = 'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage.json';
+const fontUrl = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage.json';
 const textureUrls = [
-  'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage-0.png',
-  'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage-1.png',
-  'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage-2.png',
+  'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage-0.png',
+  'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage-1.png',
+  'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64-Multipage-2.png',
 ];
 
 export default function MultipageScene() {

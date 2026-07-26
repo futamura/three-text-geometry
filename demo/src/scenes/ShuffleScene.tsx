@@ -5,8 +5,8 @@ import * as THREE from 'three/webgpu';
 import ShuffleText, { ShuffleOption, ShuffleState } from '~/effects/shuffle';
 import { useTextData } from '~/hooks/useTextData';
 
-const fontUrl = 'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.json';
-const textureUrl = 'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.png';
+const fontUrl = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.json';
+const textureUrl = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.png';
 
 const shuffleOption: ShuffleOption = {
   shuffleText: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',

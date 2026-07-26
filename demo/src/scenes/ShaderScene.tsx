@@ -6,8 +6,8 @@ import * as THREE from 'three/webgpu';
 import { useTextData } from '~/hooks/useTextData';
 import { createEffectMaterial } from '~/shaders/effect';
 
-const fontUrl = 'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.json';
-const textureUrl = 'https://raw.githubusercontent.com/gumob/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.png';
+const fontUrl = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.json';
+const textureUrl = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/OdudoMono-Regular-64.png';
 
 const DURATION = 3;
 

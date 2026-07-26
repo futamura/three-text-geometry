@@ -1,13 +1,13 @@
 [![NPM Version](https://img.shields.io/npm/v/three-text-geometry)](https://badge.fury.io/js/three-text-geometry)
-[![Main](https://github.com/gumob/three-text-geometry/actions/workflows/main.yaml/badge.svg)](https://github.com/gumob/three-text-geometry/actions/workflows/main.yaml)
-[![Develop](https://github.com/gumob/three-text-geometry/actions/workflows/develop.yaml/badge.svg)](https://github.com/gumob/three-text-geometry/actions/workflows/develop.yaml)
-[![CodeQL](https://github.com/gumob/three-text-geometry/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/gumob/three-text-geometry/actions/workflows/github-code-scanning/codeql)
-[![codecov](https://codecov.io/gh/gumob/three-text-geometry/branch/main/graph/badge.svg?token=CL35QZ32NY)](https://codecov.io/gh/gumob/three-text-geometry)
+[![Main](https://github.com/futamura/three-text-geometry/actions/workflows/main.yaml/badge.svg)](https://github.com/futamura/three-text-geometry/actions/workflows/main.yaml)
+[![Develop](https://github.com/futamura/three-text-geometry/actions/workflows/develop.yaml/badge.svg)](https://github.com/futamura/three-text-geometry/actions/workflows/develop.yaml)
+[![CodeQL](https://github.com/futamura/three-text-geometry/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/futamura/three-text-geometry/actions/workflows/github-code-scanning/codeql)
+[![codecov](https://codecov.io/gh/futamura/three-text-geometry/branch/main/graph/badge.svg?token=CL35QZ32NY)](https://codecov.io/gh/futamura/three-text-geometry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # three-text-geometry
 
-<img src="https://raw.githubusercontent.com/gumob/three-text-geometry/main/README-assets/demo.gif" alt="demo.gif" style="width:1200px;"/>
+<img src="https://raw.githubusercontent.com/futamura/three-text-geometry/main/README-assets/demo.gif" alt="demo.gif" style="width:1200px;"/>
 
 The port of the JavaScript versions of [three-bmfont-text](https://github.com/Jam3/three-bmfont-text), [layout-bmfont-text](https://github.com/Jam3/layout-bmfont-text), [load-bmfont](https://github.com/Jam3/load-bmfont), and [word-wrapper](https://github.com/mattdesl/word-wrapper) to Pure Typescript, this library enables fast text rendering with Three.js and bitmap font.<br/>
 The difference in rendering speed is noticeable when animations are enabled, and it runs 10x faster than canvas texture based text rendering.
@@ -45,9 +45,9 @@ $ yarn add three-text-geometry three react @react-three/fiber
 
 ## Usage
 
-For detailed information, read the [documentation](https://gumob.github.io/three-text-geometry/) and check the [demo](https://github.com/gumob/three-text-geometry/tree/develop/demo).
+For detailed information, read the [documentation](https://futamura.github.io/three-text-geometry/) and check the [demo](https://github.com/futamura/three-text-geometry/tree/develop/demo).
 
-[`TextGeometry`](https://gumob.github.io/three-text-geometry/classes/TextGeometry.html) supports word wrapping, text aligning, letter spacing, kerning. See [the list](#option-list) for all available options.
+[`TextGeometry`](https://futamura.github.io/three-text-geometry/classes/TextGeometry.html) supports word wrapping, text aligning, letter spacing, kerning. See [the list](#option-list) for all available options.
 
 ### React Three Fiber
 
@@ -226,7 +226,7 @@ v4 removes the legacy GLSL shader modules. If you were using `MultiPageShaderMat
 The demo is built with React Three Fiber. Clone the repository and run:
 
 ```
-git clone https://github.com/gumob/three-text-geometry.git
+git clone https://github.com/futamura/three-text-geometry.git
 cd three-text-geometry/demo
 corepack enable
 pnpm install
@@ -239,7 +239,7 @@ TextGeometry places text based on the screen coordinate system.
 Therefore, when [`THREE.Mesh`](https://threejs.org/docs/#api/en/objects/Mesh) is added to the scene, the text will be placed inverted when viewed from the positive direction of the Z axis.
 To make the text visible from the positive z-axis, you need apply transformation.
 
-![coord-conversion.webp](https://raw.githubusercontent.com/gumob/three-text-geometry/main/README-assets/coord-conversion.webp)
+![coord-conversion.webp](https://raw.githubusercontent.com/futamura/three-text-geometry/main/README-assets/coord-conversion.webp)
 
 #### BMFontParser interface supports JSON, XML, ACII, and Binary fromat
 
@@ -276,15 +276,15 @@ const font: BMFont = new BMFontBinaryParser().parse(/** `string` data in ASCII B
 <!-- prettier-ignore-start -->
 | key | type | description | default | required |
 | ----------------- | :-----------------------------------------------------------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------: | :------: |
-| **font** | [`BMFont`](https://gumob.github.io/three-text-geometry/interfaces/BMFont.html) | The BMFont definition which holds chars, kernings, etc | undefined | ✔ |
-| **width** | `number` | The desired width of the text box, causes word-wrapping and clipping in [`WordWrapMode`](https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html) mode. Leave as undefined to remove word-wrapping (default behaviour) | undefined |  |
-| **mode** | [`WordWrapMode`](https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html) | A mode for word-wrapper; can be [`WordWrapMode.Pre`](https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html#Pre) (maintain spacing), or [`WordWrapMode.NoWrap`](https://gumob.github.io/three-text-geometry/enums/WordWrapMode.html#NoWrap) (collapse whitespace but only break on newline characters), otherwise assumes normal word-wrap behaviour (collapse whitespace, break at width or newlines) | undefined |  |
-| **align** | [`TextAlign`](https://gumob.github.io/three-text-geometry/enums/TextAlign.html) | This can be [`TextAlign.left`](https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Left), [`TextAlign.center`](https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Center) or [`TextAlign.right`](https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Right) | [`TextAlign.left`](https://gumob.github.io/three-text-geometry/enums/TextAlign.html#Left) |  |
+| **font** | [`BMFont`](https://futamura.github.io/three-text-geometry/interfaces/BMFont.html) | The BMFont definition which holds chars, kernings, etc | undefined | ✔ |
+| **width** | `number` | The desired width of the text box, causes word-wrapping and clipping in [`WordWrapMode`](https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html) mode. Leave as undefined to remove word-wrapping (default behaviour) | undefined |  |
+| **mode** | [`WordWrapMode`](https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html) | A mode for word-wrapper; can be [`WordWrapMode.Pre`](https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html#Pre) (maintain spacing), or [`WordWrapMode.NoWrap`](https://futamura.github.io/three-text-geometry/enums/WordWrapMode.html#NoWrap) (collapse whitespace but only break on newline characters), otherwise assumes normal word-wrap behaviour (collapse whitespace, break at width or newlines) | undefined |  |
+| **align** | [`TextAlign`](https://futamura.github.io/three-text-geometry/enums/TextAlign.html) | This can be [`TextAlign.left`](https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Left), [`TextAlign.center`](https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Center) or [`TextAlign.right`](https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Right) | [`TextAlign.left`](https://futamura.github.io/three-text-geometry/enums/TextAlign.html#Left) |  |
 | **letterSpacing** | `number` | The letter spacing in pixels | 0 |  |
-| **lineHeight** | `number` | The line height in pixels | [`font.common.lineHeight`](https://gumob.github.io/three-text-geometry/interfaces/BMFontCommon.html#lineHeight) |  |
+| **lineHeight** | `number` | The line height in pixels | [`font.common.lineHeight`](https://futamura.github.io/three-text-geometry/interfaces/BMFontCommon.html#lineHeight) |  |
 | **tabSize** | `number` | The number of spaces to use in a single tab | 4 |  |
 | **start** | `number` | The starting index into the text to layout | 0 |  |
-| **end** | `number` | The ending index (exclusive) into the text to layout | [`text.length`](https://gumob.github.io/three-text-geometry/classes/TextGeometry.html#constructor) |  |
+| **end** | `number` | The ending index (exclusive) into the text to layout | [`text.length`](https://futamura.github.io/three-text-geometry/classes/TextGeometry.html#constructor) |  |
 | **flipY** | `boolean` | Whether the texture will be Y-flipped | true |  |
 | **multipage** | `boolean` | Whether to construct this geometry with an extra buffer containing page IDs. This is necessary for multi-texture fonts | false |  |
 <!-- prettier-ignore-end -->
