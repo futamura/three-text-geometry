@@ -17,7 +17,7 @@ jobs:
       latest: ${{ steps.check.outputs.latest }}
       should_update: ${{ steps.check.outputs.should_update }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: develop
 
@@ -69,18 +69,18 @@ jobs:
     if: needs.check-update.outputs.should_update == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: develop
 
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev xvfb
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
