@@ -116,7 +116,8 @@ const useFont = (fontUrl: string | null = null, textureUrl: string | null = null
       .then(async (res) => {
         numCompleted.current++;
         calculateProgress(loadIndex, itemBytesTotal.current[loadIndex]!, itemBytesTotal.current[loadIndex]!, url);
-        const blob = new Blob([res.data], { type: res.headers['content-type'] });
+        const contentType = res.headers['content-type'];
+        const blob = new Blob([res.data], { type: typeof contentType === 'string' ? contentType : undefined });
         const imageUrl = URL.createObjectURL(blob);
         return new TextureLoader().load(imageUrl);
       });
