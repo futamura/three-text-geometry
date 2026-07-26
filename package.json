@@ -6,11 +6,11 @@
   "author": {
     "name": "Kojiro Futamura",
     "email": "gumob.dev@gmail.com",
-    "url": "https://github.com/gumob/three-text-geometry"
+    "url": "https://github.com/futamura/three-text-geometry"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gumob/three-text-geometry.git"
+    "url": "https://github.com/futamura/three-text-geometry.git"
   },
   "publishConfig": {
     "provenance": true,
@@ -19,9 +19,9 @@
   "engines": {
     "node": ">=22"
   },
-  "homepage": "https://github.com/gumob/three-text-geometry",
+  "homepage": "https://github.com/futamura/three-text-geometry",
   "bugs": {
-    "url": "https://github.com/gumob/three-text-geometry/issues"
+    "url": "https://github.com/futamura/three-text-geometry/issues"
   },
   "files": [
     "dist-cjs",
