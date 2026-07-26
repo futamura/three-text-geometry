@@ -1,3 +1,9 @@
+## [4.0.1](https://github.com/futamura/three-text-geometry/compare/4.0.0...4.0.1) (2026-07-26)
+
+### Bug Fixes
+
+* **deps:** resolve Dependabot alerts across root and demo ([#120](https://github.com/futamura/three-text-geometry/issues/120)) ([5919be9](https://github.com/futamura/three-text-geometry/commit/5919be9587fe0b3f9ec8a34885aa37ae35781e2d)), closes [#378](https://github.com/futamura/three-text-geometry/issues/378)
+
 ## [4.0.0](https://github.com/futamura/three-text-geometry/compare/3.0.1...4.0.0) (2026-04-13)
 
 ### ⚠ BREAKING CHANGES
