@@ -177,4 +177,6 @@ jobs:
           EOF
           )"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # A PR opened with GITHUB_TOKEN does not fire the pull_request event, so
+          # the branch never gets its required tests-result check. Use the PAT.
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
