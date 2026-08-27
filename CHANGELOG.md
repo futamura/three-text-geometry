@@ -1,3 +1,9 @@
+## [4.1.0](https://github.com/futamura/three-text-geometry/compare/4.0.5...4.1.0) (2026-08-27)
+
+### Features
+
+* update three.js to 0.185.1 ([#133](https://github.com/futamura/three-text-geometry/issues/133)) ([80fa9d8](https://github.com/futamura/three-text-geometry/commit/80fa9d8ab672805151077c6d37dc3403550dcc0a))
+
 ## [4.0.5](https://github.com/futamura/three-text-geometry/compare/4.0.4...4.0.5) (2026-08-27)
 
 ### Bug Fixes
