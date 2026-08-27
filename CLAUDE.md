@@ -158,10 +158,17 @@ Equivalent alternatives: the **Update branch** button on the `develop → main` 
   `pnpm.overrides` rather than chasing the direct dependency that pulls it in.
 - The repository default `GITHUB_TOKEN` permission is `read`. Every workflow declares its
   own `permissions:` block; a new one must do the same rather than relying on the default.
-- **Allow GitHub Actions to create and approve pull requests** must stay enabled. Despite
-  the name it also gates PR *creation*, which `sync-develop-to-main.yaml` and
-  `update-three.yaml` both rely on. Turning it off fails them with
+- **Allow GitHub Actions to create and approve pull requests** is **off**. Despite the name
+  it also gates PR *creation*, so `sync-develop-to-main.yaml` and `update-three.yaml` open
+  their PRs with the `RELEASE_TOKEN` PAT instead of `GITHUB_TOKEN`. A new workflow that
+  opens a PR must do the same, or it fails with
   `GitHub Actions is not permitted to create or approve pull requests (createPullRequest)`.
-  Disabling it means moving those `gh pr create` calls to a PAT first.
-- A `develop → main` PR is automatically created when develop receives changes
+- The PAT has a second effect `update-three.yaml` depends on: a PR opened with
+  `GITHUB_TOKEN` does not fire the `pull_request` event, so `deps/update-three-*` would
+  never get the `tests-result` check that `develop` requires.
+- `RELEASE_TOKEN` is therefore load-bearing for releases *and* for automated PRs. If it
+  expires, both stop.
+- A `develop → main` PR is automatically created when develop receives changes. The
+  workflow exits early when develop is not ahead of main, which is what the post-release
+  back-merge push leaves behind.
 - Merging the `develop → main` PR (and thus npm release) is done manually
