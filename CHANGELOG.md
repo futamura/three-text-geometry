@@ -1,3 +1,9 @@
+## [4.1.1](https://github.com/futamura/three-text-geometry/compare/4.1.0...4.1.1) (2026-08-27)
+
+### Bug Fixes
+
+* **ci:** link the real three.js release tag; correct the Automation docs ([#136](https://github.com/futamura/three-text-geometry/issues/136)) ([d659f0b](https://github.com/futamura/three-text-geometry/commit/d659f0b063cc191305f260832af1fca93439bbf9)), closes [#111](https://github.com/futamura/three-text-geometry/issues/111)
+
 ## [4.1.0](https://github.com/futamura/three-text-geometry/compare/4.0.5...4.1.0) (2026-08-27)
 
 ### Features
