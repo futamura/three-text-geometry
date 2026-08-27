@@ -74,11 +74,36 @@ Dual format: CommonJS (`dist-cjs/`, ES2018) and ESM (`dist-esm/`, ES2020). Both 
 
 - **No direct push to `main` or `develop`** — all changes must go through pull requests
 - Flow: feature branch → PR → `develop` → PR → `main`
+- Exception: the post-release back-merge of `main` into `develop` is pushed directly (see
+  [Back-merge After Release](#back-merge-after-release-required))
 
 ### Merge Strategy
 
 - **feature → develop**: Squash merge (consolidate PR commits into one)
 - **develop → main**: Merge commit (preserve commit history for semantic-release analysis)
+- **main → develop**: Merge commit (back-merge, required after every release — see below)
+
+### Back-merge After Release (required)
+
+`main` has "Require branches to be up to date before merging" enabled, and every release adds
+commits that only exist on `main`:
+
+- the `develop → main` merge commit
+- the `chore(release): x.y.z [skip ci]` commit pushed by semantic-release
+
+`develop` never receives these on its own, so the *next* `develop → main` PR is blocked with
+`the head branch is not up to date with the base branch`.
+
+After each release, back-merge `main` into `develop`:
+
+```sh
+git checkout develop
+git merge origin/main --no-edit
+git push origin develop
+```
+
+Equivalent alternatives: the **Update branch** button on the `develop → main` PR, or merging with
+`--admin` to bypass the check (leaves `develop` behind and defers the problem).
 
 ### CI Requirements
 
