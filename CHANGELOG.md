@@ -1,3 +1,9 @@
+## [4.0.3](https://github.com/futamura/three-text-geometry/compare/4.0.2...4.0.3) (2026-08-27)
+
+### Bug Fixes
+
+* **ci:** set default GITHUB_TOKEN permissions to contents:read ([#126](https://github.com/futamura/three-text-geometry/issues/126)) ([1cfdfba](https://github.com/futamura/three-text-geometry/commit/1cfdfba5c6b38380ab6a95552e62507aae413c80)), closes [#10](https://github.com/futamura/three-text-geometry/issues/10) [#11](https://github.com/futamura/three-text-geometry/issues/11)
+
 ## [4.0.2](https://github.com/futamura/three-text-geometry/compare/4.0.1...4.0.2) (2026-08-27)
 
 ### Bug Fixes
