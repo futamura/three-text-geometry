@@ -1,3 +1,9 @@
+## [4.0.4](https://github.com/futamura/three-text-geometry/compare/4.0.3...4.0.4) (2026-08-27)
+
+### Bug Fixes
+
+* **ci:** stop pinning pnpm version in update-three workflow ([#128](https://github.com/futamura/three-text-geometry/issues/128)) ([851312a](https://github.com/futamura/three-text-geometry/commit/851312a9bb5a41ec1501acb84da2efe1f40160c8))
+
 ## [4.0.3](https://github.com/futamura/three-text-geometry/compare/4.0.2...4.0.3) (2026-08-27)
 
 ### Bug Fixes
