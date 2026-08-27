@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/futamura/three-text-geometry/compare/4.0.4...4.0.5) (2026-08-27)
+
+### Bug Fixes
+
+* **ci:** stop raising the three.js peerDeps floor on every update ([#131](https://github.com/futamura/three-text-geometry/issues/131)) ([052fd5f](https://github.com/futamura/three-text-geometry/commit/052fd5ffaec433d83abd4455f865ae20bb35c8d1)), closes [#130](https://github.com/futamura/three-text-geometry/issues/130)
+* correct the case of dist-cjs/layout/WordWrap files ([#134](https://github.com/futamura/three-text-geometry/issues/134)) ([3de2ff1](https://github.com/futamura/three-text-geometry/commit/3de2ff1f5f8dc05b251229baee9c5168256d7019))
+
 ## [4.0.4](https://github.com/futamura/three-text-geometry/compare/4.0.3...4.0.4) (2026-08-27)
 
 ### Bug Fixes
