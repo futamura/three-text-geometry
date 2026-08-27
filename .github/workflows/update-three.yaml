@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       latest: ${{ steps.check.outputs.latest }}
+      prefix: ${{ steps.check.outputs.prefix }}
       should_update: ${{ steps.check.outputs.should_update }}
     steps:
       - uses: actions/checkout@v7
@@ -60,6 +61,14 @@ jobs:
             exit 0
           fi
 
+          # three.js is still on 0.x, so its leading component is the major.
+          # Only a change there is a breaking update for consumers.
+          if [ "${CURRENT%%.*}" != "${LATEST%%.*}" ]; then
+            echo "prefix=feat!" >> "$GITHUB_OUTPUT"
+          else
+            echo "prefix=feat" >> "$GITHUB_OUTPUT"
+          fi
+
           echo "should_update=true" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,8 +102,7 @@ jobs:
           VERSION=${{ needs.check-update.outputs.latest }}
           jq --arg v "$VERSION" '
             .devDependencies.three = $v |
-            .devDependencies["@types/three"] = $v |
-            .peerDependencies.three = ">=" + $v
+            .devDependencies["@types/three"] = $v
           ' package.json > package.json.tmp && mv package.json.tmp package.json
 
       - name: Update demo/package.json
@@ -104,11 +112,6 @@ jobs:
             .dependencies.three = $v |
             .devDependencies["@types/three"] = $v
           ' demo/package.json > demo/package.json.tmp && mv demo/package.json.tmp demo/package.json
-
-      - name: Update README.md
-        run: |
-          VERSION=${{ needs.check-update.outputs.latest }}
-          sed -i "s/Three\.js [0-9]\+\.[0-9]\+\.[0-9]\+ or later/Three.js $VERSION or later/" README.md
 
       - name: Install dependencies
         run: |
@@ -132,7 +135,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "feat!: update three.js to $VERSION"
+          git commit -m "${{ needs.check-update.outputs.prefix }}: update three.js to $VERSION"
           git push origin deps/update-three-$VERSION
 
       - name: Create pull request
@@ -147,14 +150,15 @@ jobs:
 
           gh pr create \
             --base develop \
-            --title "feat!: update three.js to $VERSION" \
+            --title "${{ needs.check-update.outputs.prefix }}: update three.js to $VERSION" \
             $DRAFT_FLAG \
             --body "$(cat <<EOF
           ## Summary
 
           - Update \`three\` and \`@types/three\` to \`$VERSION\`
-          - Update \`peerDependencies.three\` to \`>=$VERSION\`
           - Update \`demo/package.json\` dependencies
+          - \`peerDependencies.three\` is left untouched, so consumers on older
+            three.js releases are unaffected
 
           ## Test results
 
