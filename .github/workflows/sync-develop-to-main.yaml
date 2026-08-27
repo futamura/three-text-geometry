@@ -17,7 +17,10 @@ jobs:
 
       - name: Create or update PR
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKEN can only open PRs while the repository's "Allow GitHub
+          # Actions to create and approve pull requests" toggle is on. Use the PAT
+          # so this workflow does not depend on that setting.
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           EXISTING_PR=$(gh pr list --base main --head develop --state open --json number --jq '.[0].number // empty')
           if [ -n "$EXISTING_PR" ]; then
