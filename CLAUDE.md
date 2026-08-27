@@ -119,6 +119,12 @@ Equivalent alternatives: the **Update branch** button on the `develop → main` 
 
 - **Major version** update of peerDeps (three.js, react, @react-three/fiber) → `feat!:` (breaking change, major bump)
 - **Minor/patch version** update of peerDeps → `feat:` (minor bump)
+- Raising a peerDeps **floor** is itself breaking, so do it deliberately — never as a
+  side effect of tracking the newest release
+- The `update-three` workflow follows this: it bumps `devDependencies` and
+  `demo/package.json` only, leaves `peerDependencies.three` (and the version quoted in
+  `README.md`) alone, and picks `feat!:` over `feat:` only when three.js changes its
+  leading version component
 
 ### Release Process
 
