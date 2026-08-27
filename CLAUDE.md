@@ -77,6 +77,23 @@ Dual format: CommonJS (`dist-cjs/`, ES2018) and ESM (`dist-esm/`, ES2020). Both 
 - Exception: the post-release back-merge of `main` into `develop` is pushed directly (see
   [Back-merge After Release](#back-merge-after-release-required))
 
+Both branches use classic branch protection:
+
+| Setting | `main` | `develop` |
+| --- | --- | --- |
+| Pull request required | yes (0 approvals) | yes (0 approvals) |
+| Required status check | `tests-result` | `tests-result` |
+| Require branches up to date (`strict`) | yes | no |
+| Force push / branch deletion | blocked | blocked |
+| `enforce_admins` | off | off |
+
+`enforce_admins` is off on both branches, so the repo owner can still push directly. That is what
+lets the back-merge below — and semantic-release's `chore(release)` push — succeed. The "no direct
+push" rule above is therefore policy, not something the protection enforces for the owner.
+
+`strict` is deliberately off on `develop`: with it on, merging any PR into `develop` would make
+every other open PR out of date and force an update plus a full CI re-run.
+
 ### Merge Strategy
 
 - **feature → develop**: Squash merge (consolidate PR commits into one)
@@ -107,7 +124,8 @@ Equivalent alternatives: the **Update branch** button on the `develop → main` 
 
 ### CI Requirements
 
-- `lint-check` and `test-coverage` must pass before PR merge
+- `tests-result` is the required status check on both `main` and `develop`. It aggregates the
+  `tests` matrix (Node 22.x / 24.x), which runs `pnpm lint-check` and `pnpm test-coverage`.
 
 ### Versioning (Conventional Commits)
 
