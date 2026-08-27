@@ -138,8 +138,12 @@ Equivalent alternatives: the **Update branch** button on the `develop → main` 
   disabled. The version-update config and the auto-merge workflow were removed in #111.
 - Advisories are therefore resolved by hand. For a transitive dependency, pin it through
   `pnpm.overrides` rather than chasing the direct dependency that pulls it in.
-- The repository default `GITHUB_TOKEN` permission is `read`, and workflows may not
-  approve pull requests. Every workflow declares its own `permissions:` block; a new one
-  must do the same rather than relying on the default.
+- The repository default `GITHUB_TOKEN` permission is `read`. Every workflow declares its
+  own `permissions:` block; a new one must do the same rather than relying on the default.
+- **Allow GitHub Actions to create and approve pull requests** must stay enabled. Despite
+  the name it also gates PR *creation*, which `sync-develop-to-main.yaml` and
+  `update-three.yaml` both rely on. Turning it off fails them with
+  `GitHub Actions is not permitted to create or approve pull requests (createPullRequest)`.
+  Disabling it means moving those `gh pr create` calls to a PAT first.
 - A `develop → main` PR is automatically created when develop receives changes
 - Merging the `develop → main` PR (and thus npm release) is done manually
