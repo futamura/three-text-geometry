@@ -1,3 +1,9 @@
+## [4.0.2](https://github.com/futamura/three-text-geometry/compare/4.0.1...4.0.2) (2026-08-27)
+
+### Bug Fixes
+
+* **deps:** patch js-yaml, fast-uri and react-router advisories ([#123](https://github.com/futamura/three-text-geometry/issues/123)) ([f0334f6](https://github.com/futamura/three-text-geometry/commit/f0334f6563448c5441964d9e8093d38da450fe6f))
+
 ## [4.0.1](https://github.com/futamura/three-text-geometry/compare/4.0.0...4.0.1) (2026-07-26)
 
 ### Bug Fixes
