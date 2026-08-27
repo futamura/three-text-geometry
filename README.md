@@ -16,7 +16,7 @@ The difference in rendering speed is noticeable when animations are enabled, and
 
 ## Requirements
 
-- Three.js 0.172.0 or later
+- Three.js 0.185.1 or later
 - React 19 or later
 - React Three Fiber 9 or later
 - Node.js 22 or later
