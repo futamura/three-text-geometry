@@ -133,7 +133,13 @@ Equivalent alternatives: the **Update branch** button on the `develop → main` 
 
 ### Automation
 
-- Dependabot PRs (patch/minor) are auto-approved and auto-merged to `develop`
-- Dependabot major updates require manual review
+- Dependabot **alerts** are on, but Dependabot does not open PRs here: there is no
+  `.github/dependabot.yml` (so no version updates) and automated security fix PRs are
+  disabled. The version-update config and the auto-merge workflow were removed in #111.
+- Advisories are therefore resolved by hand. For a transitive dependency, pin it through
+  `pnpm.overrides` rather than chasing the direct dependency that pulls it in.
+- The repository default `GITHUB_TOKEN` permission is `read`, and workflows may not
+  approve pull requests. Every workflow declares its own `permissions:` block; a new one
+  must do the same rather than relying on the default.
 - A `develop → main` PR is automatically created when develop receives changes
 - Merging the `develop → main` PR (and thus npm release) is done manually
