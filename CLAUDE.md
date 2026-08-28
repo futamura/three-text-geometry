@@ -68,7 +68,34 @@ Dual format: CommonJS (`dist-cjs/`, ES2018) and ESM (`dist-esm/`, ES2020). Both 
 
 - `main` — production releases (semantic-release auto-publishes to npm)
 - `develop` — development branch
+- `beta` — dormant pre-release branch, kept on purpose (see [Pre-release Channels](#pre-release-channels))
 - Feature branches merge into develop
+
+### Pre-release Channels
+
+`.releaserc.mjs` registers three pre-release channels alongside `main`:
+
+```js
+{ name: "alpha", prerelease: true },
+{ name: "beta", prerelease: true },
+{ name: "rc", prerelease: true },
+```
+
+Only `beta` exists as a branch; `alpha` and `rc` never have. semantic-release skips a configured
+branch that has no ref, which is why their absence has never broken a release.
+
+**Do not delete `beta` as branch cleanup.** It reads as a leftover — its tip is `566b0fd`
+(2025-06-23), it holds zero commits `main` lacks, and it sits 177 commits behind — but it is the
+entry point for the `beta` channel, and the only registered channel that still has one. Removing it
+is a release-configuration decision, not housekeeping: drop the `.releaserc.mjs` entry in the same
+change, or leave both in place.
+
+To cut a pre-release, branch `beta` off `main`, push the commits there, and semantic-release
+publishes `x.y.z-beta.n` under the npm `beta` dist-tag.
+
+That dist-tag is currently stale: it points at `0.0.1-beta.5` (tags `0.0.1-beta.1` through `.5`), so
+`npm install three-text-geometry@beta` resolves to a 0.0.1 pre-release rather than anything near
+`latest` (4.1.1). The next `beta` release moves it.
 
 ### Branch Protection
 
