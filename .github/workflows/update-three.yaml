@@ -5,14 +5,13 @@ on:
     - cron: '0 9 * * 1,4' # Mon & Thu 09:00 UTC
   workflow_dispatch: {}
 
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-
 jobs:
   check-update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # actions/checkout
+      issues: write # gh issue create, when @types/three lags behind three
+      pull-requests: read # gh pr list, to skip an update that already has a PR
     outputs:
       latest: ${{ steps.check.outputs.latest }}
       prefix: ${{ steps.check.outputs.prefix }}
@@ -77,6 +76,10 @@ jobs:
     needs: check-update
     if: needs.check-update.outputs.should_update == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      # Pushing deps/update-three-* only. The PR itself is opened with
+      # RELEASE_TOKEN, so no pull-requests permission is needed here.
+      contents: write
     steps:
       - uses: actions/checkout@v7
         with:

@@ -158,6 +158,10 @@ Equivalent alternatives: the **Update branch** button on the `develop → main` 
   `pnpm.overrides` rather than chasing the direct dependency that pulls it in.
 - The repository default `GITHUB_TOKEN` permission is `read`. Every workflow declares its
   own `permissions:` block; a new one must do the same rather than relying on the default.
+- Scope that block to what `GITHUB_TOKEN` itself does, not to what the workflow does. A
+  workflow that opens its PR with `RELEASE_TOKEN` needs no `pull-requests` permission at
+  all, and `update-three.yaml` declares permissions per job because only `update-and-test`
+  pushes a branch — `check-update` merely reads the repo and files an issue.
 - **Allow GitHub Actions to create and approve pull requests** is **off**. Despite the name
   it also gates PR *creation*, so `sync-develop-to-main.yaml` and `update-three.yaml` open
   their PRs with the `RELEASE_TOKEN` PAT instead of `GITHUB_TOKEN`. A new workflow that
