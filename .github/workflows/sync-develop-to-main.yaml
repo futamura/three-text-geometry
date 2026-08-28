@@ -5,9 +5,10 @@ on:
     branches:
       - develop
 
+# The PR is opened with RELEASE_TOKEN, so GITHUB_TOKEN needs nothing beyond the
+# read access actions/checkout uses.
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   create-pr:
