@@ -1,3 +1,9 @@
+## [5.0.4](https://github.com/futamura/three-text-geometry/compare/5.0.3...5.0.4) (2026-09-17)
+
+### Bug Fixes
+
+* type BMFontInfo.charset as string | string[] ([#174](https://github.com/futamura/three-text-geometry/issues/174)) ([a159bb5](https://github.com/futamura/three-text-geometry/commit/a159bb5f963ffbb59b7eb5e6e49f61ffb558cd23)), closes [#168](https://github.com/futamura/three-text-geometry/issues/168)
+
 ## [5.0.3](https://github.com/futamura/three-text-geometry/compare/5.0.2...5.0.3) (2026-09-17)
 
 ### Bug Fixes
