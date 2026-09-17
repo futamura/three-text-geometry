@@ -1,3 +1,9 @@
+## [5.0.2](https://github.com/futamura/three-text-geometry/compare/5.0.1...5.0.2) (2026-09-17)
+
+### Bug Fixes
+
+* parse quoted values with spaces in BMFontAsciiParser ([#169](https://github.com/futamura/three-text-geometry/issues/169)) ([50261a0](https://github.com/futamura/three-text-geometry/commit/50261a0a2c02263de137c1223004ca1e38cde31a)), closes [#166](https://github.com/futamura/three-text-geometry/issues/166)
+
 ## [5.0.1](https://github.com/futamura/three-text-geometry/compare/5.0.0...5.0.1) (2026-09-17)
 
 ### Bug Fixes
