@@ -129,6 +129,43 @@ describe('BMFontParser', () => {
     expect(isBMFont(font)).toEqual(true);
   });
 
+  test('Ascii / Quoted values containing spaces are not split', () => {
+    const font = new BMFontAsciiParser().parse(readLocalFile('UnitedSansRgBd-24.fnt'));
+    expect(font.info.face).toEqual('United Sans Rg Bd');
+    expect(Object.keys(font.info)).toEqual(['face', 'size', 'bold', 'italic', 'charset', 'unicode', 'stretchH', 'smooth', 'aa', 'padding', 'spacing', 'outline']);
+    expect(font.info.size).toEqual(24);
+    expect(font.info.padding).toEqual([0, 0, 0, 0]);
+    expect(font.info.spacing).toEqual([1, 1]);
+    expect(font.pages).toEqual(['UnitedSansRgBd-24_0.png']);
+  });
+
+  test('Ascii / Quoted values keep spaces, tabs and equals signs', () => {
+    const data = [
+      'info face="A  B\tC" size=12 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=1,2,3,4 spacing=-8,-8',
+      'common lineHeight=16 base=12 scaleW=256 scaleH=256 pages=2 packed=0',
+      'distanceField fieldType=msdf distanceRange=4',
+      "page id=0 file='my font_0.png'",
+      'page id=1   file="a=b.png"',
+      'char id=32 x=0 y=0 width=1 height=1 xoffset=-1 yoffset=0 xadvance=4 page=0 chnl=15',
+      'kerning first=32 second=65 amount=-1',
+    ].join('\n');
+    const font = new BMFontAsciiParser().parse(data);
+    expect(font.info.face).toEqual('A  B\tC');
+    expect(font.info.padding).toEqual([1, 2, 3, 4]);
+    expect(font.info.spacing).toEqual([-8, -8]);
+    expect(font.distanceField).toEqual({ fieldType: 'msdf', distanceRange: 4 });
+    expect(font.pages).toEqual(['my font_0.png', 'a=b.png']);
+    expect(font.chars[0]).toEqual({ id: 32, x: 0, y: 0, width: 1, height: 1, xoffset: -1, yoffset: 0, xadvance: 4, page: 0, chnl: 15 });
+    expect(font.kernings[0]).toEqual({ first: 32, second: 65, amount: -1 });
+  });
+
+  test('Ascii / Negative numeric lists are parsed as arrays', () => {
+    const font = new BMFontAsciiParser().parse(readLocalFile('DejaVu-sdf.fnt'));
+    expect(font.info.face).toEqual('DejaVu Sans Mono');
+    expect(font.info.padding).toEqual([4, 4, 4, 4]);
+    expect(font.info.spacing).toEqual([-8, -8]);
+  });
+
   test('Binary / Valid', () => {
     const data = readLocalFile('Arial.bin', true);
     const font = new BMFontBinaryParser().parse(data);
