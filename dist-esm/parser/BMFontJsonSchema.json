@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/BMFont",
     "definitions": {
         "BMFont": {
             "title": "BMFont",
@@ -39,7 +40,10 @@
                     "title": "kernings"
                 }
             },
-            "required": ["chars", "common", "distanceField", "info", "kernings", "pages"]
+            "required": [
+                "chars",
+                "common"
+            ]
         },
         "BMFontChar": {
             "title": "BMFontChar",
@@ -95,18 +99,14 @@
                 }
             },
             "required": [
-                "char",
-                "chnl",
-                "height",
                 "id",
-                "index",
-                "page",
-                "width",
                 "x",
-                "xadvance",
-                "xoffset",
                 "y",
-                "yoffset"
+                "width",
+                "height",
+                "xoffset",
+                "yoffset",
+                "xadvance"
             ]
         },
         "BMFontInfo": {
@@ -181,22 +181,7 @@
                     "type": "number",
                     "title": "outline"
                 }
-            },
-            "required": [
-                "aa",
-                "bold",
-                "charset",
-                "face",
-                "fixedHeight",
-                "italic",
-                "outline",
-                "padding",
-                "size",
-                "smooth",
-                "spacing",
-                "stretchH",
-                "unicode"
-            ]
+            }
         },
         "BMFontCommon": {
             "title": "BMFontCommon",
@@ -244,16 +229,10 @@
                 }
             },
             "required": [
-                "alphaChnl",
-                "base",
-                "blueChnl",
-                "greenChnl",
                 "lineHeight",
-                "packed",
-                "pages",
-                "redChnl",
-                "scaleH",
-                "scaleW"
+                "base",
+                "scaleW",
+                "scaleH"
             ]
         },
         "BMFontDistanceField": {
@@ -268,8 +247,7 @@
                     "type": "number",
                     "title": "distanceRange"
                 }
-            },
-            "required": ["distanceRange", "fieldType"]
+            }
         },
         "BMFontKern": {
             "title": "BMFontKern",
@@ -288,7 +266,11 @@
                     "title": "amount"
                 }
             },
-            "required": ["amount", "first", "second"]
+            "required": [
+                "amount",
+                "first",
+                "second"
+            ]
         }
     }
 }
