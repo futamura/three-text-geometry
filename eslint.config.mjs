@@ -106,7 +106,6 @@ export default tseslint.config(
       "dist-esm",
       "tests",
       "jest.config.ts",
-      "jest.config.e2e.ts",
       "scripts",
       "coverage",
       "demo",
