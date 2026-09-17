@@ -22,7 +22,10 @@ const config: Config.InitialOptions = {
   modulePathIgnorePatterns: ['<rootDir>/demo/'],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
+    // three is ESM-only since r186 (build/three.cjs only does require(esm)), so its build files are transpiled to CommonJS.
+    '^.+/node_modules/three/build/.+\\.js$': ['ts-jest', { tsconfig: { allowJs: true }, diagnostics: false }],
   },
+  transformIgnorePatterns: ['/node_modules/(?!(\\.pnpm/three@[^/]+/node_modules/)?three/build/)'],
   testEnvironment: 'node',
 }
 
