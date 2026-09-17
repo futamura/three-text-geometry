@@ -27,6 +27,12 @@ describe('BMFontParser', () => {
     expect(isBMFont(font)).toEqual(true);
   });
 
+  test('XML / Channel attributes are read', () => {
+    const data = readLocalFile('Roboto-Regular.xml').replace('alphaChnl="0" redChnl="0" greenChnl="0" blueChnl="0"', 'alphaChnl="1" redChnl="2" greenChnl="3" blueChnl="4"');
+    const font = new BMFontXMLParser().parse(data);
+    expect([font.common.alphaChnl, font.common.redChnl, font.common.greenChnl, font.common.blueChnl]).toEqual([1, 2, 3, 4]);
+  });
+
   test('XML / Invalid Single Page', () => {
     try {
       const data = readLocalFile('Roboto-Regular-invalid.xml');
