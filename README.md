@@ -151,12 +151,14 @@ scene.add(mesh)
 
 three-text-geometry provides TSL-based node materials for text rendering. These materials work with both `WebGLRenderer` and `WebGPURenderer`.
 
+They are published from the `three-text-geometry/tsl` subpath, not the root entry, because they import `three/webgpu` and `three/tsl`. An app that only uses `TextGeometry`, the parsers or the React Three Fiber helper does not bundle the WebGPU renderer.
+
 #### BasicTextNodeMaterial
 
 Samples a font texture and multiplies by color and opacity. Suitable for standard bitmap fonts.
 
 ```TypeScript
-import { BasicTextNodeMaterial } from 'three-text-geometry'
+import { BasicTextNodeMaterial } from 'three-text-geometry/tsl'
 
 const material = new BasicTextNodeMaterial({
   map: texture,
@@ -170,7 +172,7 @@ const material = new BasicTextNodeMaterial({
 For SDF (Signed Distance Field) fonts. Uses screen-space derivatives for anti-aliased edges.
 
 ```TypeScript
-import { SDFTextNodeMaterial } from 'three-text-geometry'
+import { SDFTextNodeMaterial } from 'three-text-geometry/tsl'
 
 const material = new SDFTextNodeMaterial({
   map: texture,
@@ -183,7 +185,7 @@ const material = new SDFTextNodeMaterial({
 For MSDF (Multi-channel Signed Distance Field) fonts. Computes a median from RGB channels for high-quality rendering.
 
 ```TypeScript
-import { MSDFTextNodeMaterial } from 'three-text-geometry'
+import { MSDFTextNodeMaterial } from 'three-text-geometry/tsl'
 
 const material = new MSDFTextNodeMaterial({
   map: texture,
@@ -197,7 +199,7 @@ const material = new MSDFTextNodeMaterial({
 For multi-texture fonts. Selects the correct texture atlas per vertex using a page attribute. Requires `multipage: true` in `TextGeometryOption`.
 
 ```TypeScript
-import { MultiPageTextNodeMaterial } from 'three-text-geometry'
+import { MultiPageTextNodeMaterial } from 'three-text-geometry/tsl'
 
 const material = new MultiPageTextNodeMaterial({
   textures: [texture0, texture1, texture2],
@@ -209,6 +211,19 @@ const geometry = new TextGeometry('Hello', {
   multipage: true,
 })
 ```
+
+### Migration from v4
+
+v5 moves the node materials and their option types out of the root entry into `three-text-geometry/tsl`. Nothing else changed; update the import path:
+
+```TypeScript
+// v4
+import { MSDFTextNodeMaterial } from 'three-text-geometry'
+// v5
+import { MSDFTextNodeMaterial } from 'three-text-geometry/tsl'
+```
+
+This applies to `BasicTextNodeMaterial`, `SDFTextNodeMaterial`, `MSDFTextNodeMaterial`, `MultiPageTextNodeMaterial`, `TextMaterialOption`, `MSDFTextMaterialOption` and `MultiPageTextMaterialOption`.
 
 ### Migration from v3
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useLoader } from '@react-three/fiber';
-import TextGeometry, { MultiPageTextNodeMaterial, TextAlign, useFont } from 'three-text-geometry';
+import TextGeometry, { TextAlign, useFont } from 'three-text-geometry';
+import { MultiPageTextNodeMaterial } from 'three-text-geometry/tsl';
 import * as THREE from 'three/webgpu';
 
 import { useTextData } from '~/hooks/useTextData';

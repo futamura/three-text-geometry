@@ -32,7 +32,7 @@ Run a single test file: `pnpm jest tests/parser.spec.ts`
 
 **Font parsers** (`src/parser/`): Four parsers implementing `IBMFontParser<T>` — `BMFontJsonParser` (with AJV schema validation), `BMFontXMLParser`, `BMFontAsciiParser`, `BMFontBinaryParser`. All parse into the common `BMFont` type defined in `src/types/BMFont.ts`.
 
-**Shaders** (`src/shaders/`): GLSL shader sources for basic, SDF, and MSDF rendering. `src/shader/MultiPageShaderMaterial.ts` provides the material class for multi-texture fonts.
+**Materials** (`src/materials/`): TSL node materials — `BasicTextNodeMaterial`, `SDFTextNodeMaterial`, `MSDFTextNodeMaterial`, `MultiPageTextNodeMaterial`. Exported only from the `three-text-geometry/tsl` subpath (`src/tsl.ts`); see [Entry points and `sideEffects`](#entry-points-and-sideeffects). The GLSL shaders were removed in 4.0.0.
 
 **React integration:** `src/helpers/fiber.ts` extends R3F for `<textGeometry>` JSX usage. `src/helpers/hook.ts` provides React hooks.
 
@@ -41,6 +41,16 @@ Run a single test file: `pnpm jest tests/parser.spec.ts`
 ## Build Output
 
 Dual format: CommonJS (`dist-cjs/`, ES2018) and ESM (`dist-esm/`, ES2020). Both configured via separate tsconfig files (`tsconfig.cjs.json`, `tsconfig.esm.json`), and both compile with plain `tsc` — there are no transformer plugins.
+
+### dist is committed, and it is what npm publishes
+
+The release job runs `pnpm semantic-release` without building, so the tarball contains `dist-cjs/` and `dist-esm/` exactly as committed. Any `src/` change that should ship must include the rebuilt dist in the same PR (`pnpm build`; the output is deterministic, so unrelated files do not churn).
+
+### Entry points and `sideEffects`
+
+- `.` (`src/index.ts`) must not reach `src/materials/`. The TSL node materials import `three/webgpu` and `three/tsl`, and re-exporting them from the root put the WebGPU renderer (~87 KB gzip) in every consumer's bundle in 4.x. They live on the `./tsl` subpath (`src/tsl.ts`) since 5.0.0.
+- `sideEffects` lists `dist-*/index.js` as well as `dist-*/helpers/fiber.js`. `import 'three-text-geometry'` exists to run `extend({ TextGeometry })`; if the index is marked side-effect free, a bundler drops that bare import before it ever reaches fiber.
+- `pnpm verify-tree-shaking` bundles both cases from the committed dist with esbuild and runs in the `tests` job of both workflows. `node scripts/verify-tree-shaking.mjs <unpacked-tarball>` checks a published version; against 4.2.0 it fails, which is how to confirm the check still detects a leak.
 
 The `@three-text-geometry/*` → `./src/*` aliases in `compilerOptions.paths` are used by `tests/` only; `src/` imports relatively, so the build has nothing to rewrite. Jest resolves the aliases through `pathsToModuleNameMapper` in `jest.config.ts`, which reads that same `paths` block — keep it even though the build does not need it.
 

@@ -31,16 +31,32 @@
     ".": {
       "require": "./dist-cjs/index.js",
       "import": "./dist-esm/index.js"
+    },
+    "./tsl": {
+      "require": "./dist-cjs/tsl.js",
+      "import": "./dist-esm/tsl.js"
     }
   },
   "main": "./dist-cjs/index.js",
   "module": "./dist-esm/index.js",
+  "typesVersions": {
+    "*": {
+      "tsl": [
+        "./dist-esm/tsl.d.ts"
+      ]
+    }
+  },
+  "sideEffects": [
+    "./dist-*/index.js",
+    "./dist-*/helpers/fiber.js"
+  ],
   "scripts": {
     "format-fix": "prettier --write .",
     "format-check": "prettier --check .",
     "lint-fix": "eslint src tests --fix",
     "lint-check": "eslint src tests --max-warnings 0",
     "verify-release-notes": "node scripts/verify-release-notes.mjs",
+    "verify-tree-shaking": "node scripts/verify-tree-shaking.mjs",
     "dev": "pnpm clean-dist && tsc --build --watch tsconfig.cjs.json tsconfig.esm.json",
     "build": "pnpm clean-dist && pnpm build-cjs && pnpm build-esm && pnpm minify-cjs && pnpm minify-esm",
     "build-cjs": "tsc --project tsconfig.cjs.json",
@@ -99,6 +115,7 @@
     "@typescript-eslint/parser": "^8.70.0",
     "axios": "^1.20.0",
     "canvas": "^3.2.3",
+    "esbuild": "^0.28.2",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsdoc": "^64.3.6",
