@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { BMFontError } from '@three-text-geometry/error';
 import { BMFontAsciiParser, BMFontBinaryParser, BMFontJsonParser, BMFontXMLParser } from '@three-text-geometry/parser';
-import { isBMFont } from '@three-text-geometry/types';
+import { DefaultBMFontCommon, DefaultBMFontDistanceField, DefaultBMFontInfo, isBMFont } from '@three-text-geometry/types';
 
 function readLocalFile(filePath: string): string;
 function readLocalFile(filePath: string, binary: true): Buffer;
@@ -71,21 +71,60 @@ describe('BMFontParser', () => {
   });
 
   test('Json / Empty', () => {
-    try {
-      const data = readLocalFile('Roboto-Regular-empty.json');
-      new BMFontJsonParser().parse(data);
-    } catch (error: any) {
-      expect(error instanceof BMFontError).toBe(true);
-    }
+    const data = readLocalFile('Roboto-Regular-empty.json');
+    expect(() => new BMFontJsonParser().parse(data)).toThrow(BMFontError);
   });
 
   test('Json / Invalid', () => {
-    try {
-      const data = readLocalFile('Roboto-Regular-invalid.json');
-      new BMFontJsonParser().parse(data);
-    } catch (error: any) {
-      expect(error instanceof BMFontError).toBe(true);
+    const data = readLocalFile('Roboto-Regular-invalid.json');
+    expect(() => new BMFontJsonParser().parse(data)).toThrow(BMFontError);
+  });
+
+  test('Json / Values that are not a font object are rejected', () => {
+    for (const data of ['42', 'null', '[]', '"font"']) {
+      expect(() => new BMFontJsonParser().parse(data)).toThrow(BMFontError);
     }
+  });
+
+  test('Json / Fonts from each generator in tests/fonts are accepted', () => {
+    for (const file of ['Roboto-Regular.json', 'Lato-Regular-32.json', 'OdudoMono-Regular-64.json', 'OdudoMono-Regular-64-Multipage.json', 'OdudoMono-Regular-128.json', 'OdudoMono-Regular-128-Multipage.json']) {
+      expect(isBMFont(new BMFontJsonParser().parse(readLocalFile(file)))).toEqual(true);
+    }
+  });
+
+  test('Json / Fields the layout reads are required', () => {
+    const font = JSON.parse(readLocalFile('Roboto-Regular.json'));
+    for (const key of ['chars', 'common']) {
+      const { [key]: _removed, ...rest } = font;
+      expect(() => new BMFontJsonParser().parse(rest)).toThrow(new BMFontError(`Invalid json data: data must have required property '${key}'`));
+    }
+    for (const key of ['lineHeight', 'base', 'scaleW', 'scaleH']) {
+      const { [key]: _removed, ...common } = font.common;
+      expect(() => new BMFontJsonParser().parse({ ...font, common })).toThrow(BMFontError);
+    }
+    for (const key of ['id', 'x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance']) {
+      const { [key]: _removed, ...char } = font.chars[0];
+      expect(() => new BMFontJsonParser().parse({ ...font, chars: [char, ...font.chars.slice(1)] })).toThrow(BMFontError);
+    }
+  });
+
+  test('Json / Fields with the wrong type are rejected', () => {
+    const font = JSON.parse(readLocalFile('Roboto-Regular.json'));
+    expect(() => new BMFontJsonParser().parse({ ...font, common: { ...font.common, lineHeight: '42' } })).toThrow(BMFontError);
+    expect(() => new BMFontJsonParser().parse({ ...font, kernings: [{ first: 1, second: 2 }] })).toThrow(BMFontError);
+  });
+
+  test('Json / Optional fields are filled with defaults', () => {
+    const font = new BMFontJsonParser().parse({ chars: [], common: { lineHeight: 1, base: 2, scaleW: 3, scaleH: 4 } });
+    expect(font.pages).toEqual([]);
+    expect(font.kernings).toEqual([]);
+    expect(font.info).toEqual(DefaultBMFontInfo());
+    expect(font.common).toEqual({ ...DefaultBMFontCommon(), lineHeight: 1, base: 2, scaleW: 3, scaleH: 4 });
+    expect(font.distanceField).toEqual(DefaultBMFontDistanceField());
+
+    const msdf = new BMFontJsonParser().parse(readLocalFile('Roboto-Regular.json'));
+    expect([msdf.info.fixedHeight, msdf.info.outline]).toEqual([0, 0]);
+    expect(msdf.distanceField).toEqual({ fieldType: 'msdf', distanceRange: 4 });
   });
 
   test('Ascii / Valid / DejaVu-sdf.fnt', () => {
