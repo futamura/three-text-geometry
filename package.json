@@ -66,8 +66,6 @@
     "minify-esm": "find dist-esm -name '*.js' | sed 's/\\.js$//' | xargs -I {} pnpm uglifyjs --compress --mangle --source-map 'content={}.js.map' --source-map 'filename={}.js.map' --output '{}.js' -- '{}.js'",
     "test": "pnpm clean-jest && jest",
     "test-coverage": "pnpm clean-jest && pnpm clean-coverage && jest --coverage",
-    "test-e2e": "jest --config jest.config.e2e.ts",
-    "_test-e2e": "playwright test ./tests/demo.e2e.ts",
     "clean-all": "pnpm clean-cache && pnpm clean-jest&& pnpm clean-dist && pnpm modules-clean",
     "clean-jest": "jest --clearCache",
     "clean-coverage": "rm -rf coverage",
@@ -97,7 +95,6 @@
     "@jest/types": "^30.5.1",
     "@microsoft/tsdoc": "^0.16.0",
     "@microsoft/tsdoc-config": "^0.18.1",
-    "@playwright/test": "^1.63.0",
     "@react-three/fiber": "^9.7.0",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/commit-analyzer": "^13.0.1",
@@ -124,12 +121,10 @@
     "jest-circus": "^30.5.1",
     "jest-environment-jsdom": "^30.5.1",
     "jest-environment-node": "^30.5.1",
-    "jest-playwright-preset": "^4.0.0",
     "jest-runner": "^30.5.1",
     "jest-watch-select-projects": "^2.0.0",
     "jest-watch-suspend": "^2.0.0",
     "jest-watch-typeahead": "^3.0.1",
-    "playwright": "^1.63.0",
     "prettier": "^3.9.6",
     "prettier-plugin-multiline-arrays": "^4.1.11",
     "react": "^19.2.8",
@@ -152,14 +147,12 @@
   "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c",
   "pnpm": {
     "overrides": {
-      "uuid@<11.1.1": "^11.1.1",
       "js-yaml@<3.15.1": "^3.15.1",
       "js-yaml@>=4.0.0 <4.3.1": "^4.3.1",
       "fast-uri@<3.1.5": "^3.1.5",
       "brace-expansion@<1.1.18": "^1.1.18",
       "brace-expansion@>=2.0.0 <2.1.4": "^2.1.4",
-      "brace-expansion@>=4.0.0 <5.0.9": "^5.0.9",
-      "joi@>=16.0.0 <17.13.7": "^17.13.7"
+      "brace-expansion@>=4.0.0 <5.0.9": "^5.0.9"
     }
   }
 }

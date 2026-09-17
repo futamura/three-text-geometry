@@ -14,7 +14,6 @@ pnpm build            # Full build (CJS + ESM + minification)
 pnpm dev              # Watch mode for both CJS and ESM
 pnpm test             # Run all tests
 pnpm test-coverage    # Run tests with coverage
-pnpm test-e2e         # Run E2E tests (requires Playwright)
 pnpm lint-check       # ESLint check (max-warnings 0)
 pnpm lint-fix         # ESLint auto-fix
 pnpm format-check     # Prettier check

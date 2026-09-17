@@ -21,7 +21,6 @@ local option_list=(
     # "minify-esm:           Minifies the ESModule project"
     "dev:                  Starts the development server"
     # "test:                 Runs the tests"
-    # "test-e2e:             Runs the E2E tests"
     "test-coverage:        Runs the tests and generates the coverage report"
     # "clean-all:            Cleans the project"
     # "clean-jest:           Cleans the jest cache"
