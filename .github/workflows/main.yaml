@@ -47,6 +47,9 @@ jobs:
       - name: Verify release notes rendering
         run: pnpm verify-release-notes
 
+      - name: Verify tree shaking
+        run: pnpm verify-tree-shaking
+
       - name: Test
         run: xvfb-run --auto-servernum pnpm test-coverage
 
