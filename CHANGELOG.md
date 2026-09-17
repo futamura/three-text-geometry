@@ -1,3 +1,9 @@
+## [5.0.3](https://github.com/futamura/three-text-geometry/compare/5.0.2...5.0.3) (2026-09-17)
+
+### Bug Fixes
+
+* read blueChnl in BMFontXMLParser ([#171](https://github.com/futamura/three-text-geometry/issues/171)) ([203cd31](https://github.com/futamura/three-text-geometry/commit/203cd31623b01b4bb659d740c6170004eb43dee7)), closes [#167](https://github.com/futamura/three-text-geometry/issues/167)
+
 ## [5.0.2](https://github.com/futamura/three-text-geometry/compare/5.0.1...5.0.2) (2026-09-17)
 
 ### Bug Fixes
