@@ -1,10 +1,9 @@
 import { useRef } from 'react';
-import axios from 'axios';
 import useSWR from 'swr';
-import { Texture, TextureLoader } from 'three';
+import { Texture } from 'three';
 
-import { BMFontAsciiParser, BMFontBinaryParser, BMFontJsonParser, BMFontXMLParser } from '../parser';
 import { BMFont } from '../types';
+import { download, loadTexture, parseFont } from './loader';
 
 interface FontProgressCallback {
   (loaded: number, total: number, percent: number): void;
@@ -75,52 +74,18 @@ const useFont = (fontUrl: string | null = null, textureUrl: string | null = null
 
   const fontFetcher = async (url: string | null, loadIndex: number): Promise<BMFont | null> => {
     if (!url) return null;
-    return axios
-      .get(url, {
-        onDownloadProgress: async (progressEvent) => {
-          calculateProgress(loadIndex, progressEvent.loaded, progressEvent.total ?? 0, url);
-        },
-      })
-      .then(async (res) => {
-        numCompleted.current++;
-        calculateProgress(loadIndex, itemBytesTotal.current[loadIndex]!, itemBytesTotal.current[loadIndex]!, url);
-        const text = res.data;
-        const extension = url.split('.').pop()?.toLowerCase();
-        switch (extension) {
-          case 'xml':
-            return new BMFontXMLParser().parse(text);
-          case 'bin':
-            return new BMFontBinaryParser().parse(Buffer.from(text, 'utf-8'));
-          case 'json':
-            return new BMFontJsonParser().parse(text);
-          case 'fnt':
-            return new BMFontAsciiParser().parse(text);
-          default:
-            return new BMFontAsciiParser().parse(text);
-        }
-      });
+    const { bytes } = await download(url, (loaded, total) => calculateProgress(loadIndex, loaded, total, url));
+    numCompleted.current++;
+    calculateProgress(loadIndex, itemBytesTotal.current[loadIndex]!, itemBytesTotal.current[loadIndex]!, url);
+    return parseFont(url, bytes);
   };
 
   const textureFetcher = async (url: string | null, loadIndex: number): Promise<Texture | null> => {
     if (!url) return null;
-    return axios
-      .get(url, {
-        responseType: 'arraybuffer',
-        headers: {
-          'Content-Type': 'image/*',
-        },
-        onDownloadProgress: async (progressEvent) => {
-          calculateProgress(loadIndex, progressEvent.loaded, progressEvent.total ?? 0, url);
-        },
-      })
-      .then(async (res) => {
-        numCompleted.current++;
-        calculateProgress(loadIndex, itemBytesTotal.current[loadIndex]!, itemBytesTotal.current[loadIndex]!, url);
-        const contentType = res.headers['content-type'];
-        const blob = new Blob([res.data], { type: typeof contentType === 'string' ? contentType : undefined });
-        const imageUrl = URL.createObjectURL(blob);
-        return new TextureLoader().load(imageUrl);
-      });
+    const { bytes, contentType } = await download(url, (loaded, total) => calculateProgress(loadIndex, loaded, total, url));
+    numCompleted.current++;
+    calculateProgress(loadIndex, itemBytesTotal.current[loadIndex]!, itemBytesTotal.current[loadIndex]!, url);
+    return loadTexture(bytes, contentType);
   };
 
   /*********************************

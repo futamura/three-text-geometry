@@ -135,21 +135,32 @@ describe('BMFontParser', () => {
     expect(isBMFont(font)).toEqual(true);
   });
 
+  test('Binary / Valid / Uint8Array and ArrayBuffer match Buffer', () => {
+    const data = readLocalFile('Arial.bin', true);
+    const expected = new BMFontBinaryParser().parse(data);
+    expect(expected.info.face).toEqual('Arial');
+    expect(expected.pages).toEqual(['font-bin_0.tga']);
+    expect(expected.chars).toHaveLength(191);
+    expect(expected.kernings).toHaveLength(91);
+
+    /** A view into a larger buffer, as a pooled `Buffer` or a sliced download would be. */
+    const padded = new Uint8Array(data.byteLength + 16);
+    padded.set(data, 8);
+    expect(new BMFontBinaryParser().parse(padded.subarray(8, 8 + data.byteLength))).toEqual(expected);
+    expect(new BMFontBinaryParser().parse(Uint8Array.from(data).buffer)).toEqual(expected);
+  });
+
   test('Binary / Invalid', () => {
-    try {
-      const data = readLocalFile('Arial-invalid.bin', true);
-      new BMFontBinaryParser().parse(data);
-    } catch (error: any) {
-      expect(error instanceof BMFontError).toBe(true);
-    }
+    const data = readLocalFile('Arial-invalid.bin', true);
+    expect(() => new BMFontBinaryParser().parse(data)).toThrow(BMFontError);
   });
 
   test('Binary / Empty', () => {
-    try {
-      const data = readLocalFile('Arial-empty.bin', true);
-      new BMFontBinaryParser().parse(data);
-    } catch (error: any) {
-      expect(error instanceof BMFontError).toBe(true);
-    }
+    const data = readLocalFile('Arial-empty.bin', true);
+    expect(() => new BMFontBinaryParser().parse(data)).toThrow(new BMFontError('Invalid buffer length'));
+  });
+
+  test('Binary / Missing header', () => {
+    expect(() => new BMFontBinaryParser().parse(new Uint8Array([0, 0, 0, 3, 0, 0]))).toThrow(new BMFontError('Missing BMF byte header'));
   });
 });
