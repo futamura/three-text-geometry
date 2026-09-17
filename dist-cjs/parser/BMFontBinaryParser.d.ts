@@ -1,8 +1,7 @@
-import { Buffer } from 'buffer';
 import { BMFont, IBMFontParser } from '../types';
-declare class BMFontBinaryParser implements IBMFontParser<Buffer> {
+declare class BMFontBinaryParser implements IBMFontParser<Uint8Array | ArrayBuffer> {
     private static HEADER;
-    parse(buf: Buffer): BMFont;
+    parse(data: Uint8Array | ArrayBuffer): BMFont;
     private readBlock;
     private readInfo;
     private readCommon;
@@ -10,7 +9,8 @@ declare class BMFontBinaryParser implements IBMFontParser<Buffer> {
     private readChars;
     private readKernings;
     private readStringNT;
-    private readNameNT;
+    private readNameLengthNT;
+    private decodeUtf8;
 }
 export { BMFontBinaryParser };
 //# sourceMappingURL=BMFontBinaryParser.d.ts.map

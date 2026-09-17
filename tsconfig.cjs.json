@@ -18,7 +18,7 @@
     "declaration": true,                                      // Generate declaration files <https://www.typescriptlang.org/tsconfig#declaration>
     "declarationMap": true,                                   // Generate declaration maps <https://www.typescriptlang.org/tsconfig#declarationMap>
     "removeComments": true,                                   // Remove comments from output <https://www.typescriptlang.org/tsconfig#removeComments>
-    "importHelpers": true,                                    // Use helper functions from TypeScript library <https://www.typescriptlang.org/tsconfig#importHelpers>
+    "importHelpers": false,                                   // Inline helpers so the published build does not require tslib <https://www.typescriptlang.org/tsconfig#importHelpers>
   },
   "include": ["src"]                                          // Directories to include for TypeScript compilation <https://www.typescriptlang.org/tsconfig#include>
 }
