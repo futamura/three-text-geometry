@@ -170,12 +170,17 @@ interface BMFontInfo {
    */
   italic: number;
   /**
-   * The name of the OEM charset used (when not unicode).
+   * The charset of the font. Its shape depends on the source format:
    *
-   * @type {string[]}
+   * - ASCII (`.fnt`): the name of the OEM charset used (when not unicode), as a `string` (`""` when unset).
+   * - XML: the comma-separated names as a `string[]` (`[]` when unset).
+   * - Binary: always `[]`; the charset byte is not read.
+   * - JSON: passed through unchanged. msdf-bmfont-xml writes the list of generated characters as a `string[]`.
+   *
+   * @type {string | string[]}
    * @memberof BMFontInfo
    */
-  charset: string[];
+  charset: string | string[];
   /**
    * Set to 1 if it is the unicode charset.
    *

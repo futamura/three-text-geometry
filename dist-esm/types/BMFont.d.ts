@@ -25,7 +25,7 @@ interface BMFontInfo {
     size: number;
     bold: number;
     italic: number;
-    charset: string[];
+    charset: string | string[];
     unicode: number;
     stretchH: number;
     smooth: number;
