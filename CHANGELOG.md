@@ -1,3 +1,9 @@
+## [5.0.1](https://github.com/futamura/three-text-geometry/compare/5.0.0...5.0.1) (2026-09-17)
+
+### Bug Fixes
+
+* drop undeclared runtime imports axios, tslib and buffer ([#164](https://github.com/futamura/three-text-geometry/issues/164)) ([4d8cc33](https://github.com/futamura/three-text-geometry/commit/4d8cc3320d3bb3b72d249c23e9ca00080809363f)), closes [#162](https://github.com/futamura/three-text-geometry/issues/162)
+
 ## [5.0.0](https://github.com/futamura/three-text-geometry/compare/4.2.0...5.0.0) (2026-09-17)
 
 ### ⚠ BREAKING CHANGES
