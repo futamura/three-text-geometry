@@ -4,8 +4,6 @@ export * from './helpers/fiber';
 export * from './helpers/hook';
 export { BMFontError } from './error';
 export { BMFontAsciiParser, BMFontBinaryParser, BMFontJsonParser, BMFontXMLParser } from './parser';
-export { BasicTextNodeMaterial, MSDFTextNodeMaterial, MultiPageTextNodeMaterial, SDFTextNodeMaterial } from './materials';
-export type { MSDFTextMaterialOption, MultiPageTextMaterialOption, TextMaterialOption } from './materials';
 export { BMFont, BMFontChar, BMFontCommon, BMFontDistanceField, BMFontInfo, BMFontKern, TextAlign, TextGeometryOption, TextGlyph, WordWrapMode } from './types';
 
 export default TextGeometry;
