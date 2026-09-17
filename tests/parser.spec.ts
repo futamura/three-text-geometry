@@ -159,6 +159,20 @@ describe('BMFontParser', () => {
     expect(font.kernings[0]).toEqual({ first: 32, second: 65, amount: -1 });
   });
 
+  test('Ascii / Long lines without separators parse in linear time', () => {
+    const data = [
+      `info face="A" size=12 ${'a'.repeat(50000)} padding=0,0,0,0 spacing=0,0 junk="${'b '.repeat(25000)}`,
+      'common lineHeight=16 base=12 scaleW=256 scaleH=256 pages=1 packed=0',
+      'page id=0 file="a.png"',
+      'char id=32 x=0 y=0 width=1 height=1 xoffset=0 yoffset=0 xadvance=4 page=0 chnl=15',
+    ].join('\n');
+    const start = Date.now();
+    const font = new BMFontAsciiParser().parse(data);
+    expect(Date.now() - start).toBeLessThan(1000);
+    expect(font.info.face).toEqual('A');
+    expect(font.info.padding).toEqual([0, 0, 0, 0]);
+  });
+
   test('Ascii / Negative numeric lists are parsed as arrays', () => {
     const font = new BMFontAsciiParser().parse(readLocalFile('DejaVu-sdf.fnt'));
     expect(font.info.face).toEqual('DejaVu Sans Mono');
