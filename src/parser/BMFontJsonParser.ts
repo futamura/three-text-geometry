@@ -1,14 +1,22 @@
-import Ajv from 'ajv';
+import Ajv, { ValidateFunction } from 'ajv';
 
 import { BMFontError } from '../error';
-import { BMFont, IBMFontParser } from '../types';
+import { BMFont, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontDistanceField, DefaultBMFontInfo, IBMFontParser } from '../types';
 import schema from './BMFontJsonSchema.json';
 
 /**
- * # How to create a json schema
+ * # About the json schema
+ * The schema was first generated from `src/types/BMFont.ts` with quicktype:
  * $ npm install -g quicktype
  * $ quicktype ./src/types/BMFont.ts -o ./src/parser/BMFontJsonSchema.json --lang schema
+ *
+ * It has since been edited by hand, so do not regenerate it. The root `$ref` makes the validator check the
+ * font at all, and `required` only lists the fields the layout and geometry read. Generators omit the rest
+ * (msdf-bmfont-xml writes no `info.fixedHeight`/`outline`; JSON converted from `.fnt` has no `distanceField`
+ * or `chars[].index`/`char`), and `parse` fills them with defaults.
  */
+let ajv: Ajv | undefined;
+let validate: ValidateFunction | undefined;
 
 /**
  * The class for parsing font data in JSON format.
@@ -32,19 +40,24 @@ class BMFontJsonParser implements IBMFontParser<object | string> {
    * @memberof BMFontJsonParser
    */
   public parse(json: object | string): BMFont {
+    let data: any;
     try {
-      if (typeof json === 'string') json = JSON.parse(json);
-      const ajv = new Ajv();
-      const validate = ajv.compile(schema);
-      const valid: boolean = validate(json);
-      if (valid) {
-        return json as BMFont;
-      } else {
-        throw new BMFontError('Invalid json data');
-      }
+      data = typeof json === 'string' ? JSON.parse(json) : json;
     } catch (error: any) {
       throw new BMFontError(error.message);
     }
+    /** Compiled on first use, so importing the package does not pay for it. */
+    ajv ??= new Ajv();
+    validate ??= ajv.compile(schema);
+    const valid: boolean = validate(data);
+    if (!valid) throw new BMFontError(`Invalid json data: ${ajv.errorsText(validate.errors)}`);
+    return {
+      ...DefaultBMFont(),
+      ...data,
+      info: { ...DefaultBMFontInfo(), ...data.info },
+      common: { ...DefaultBMFontCommon(), ...data.common },
+      distanceField: { ...DefaultBMFontDistanceField(), ...data.distanceField },
+    };
   }
 }
 
