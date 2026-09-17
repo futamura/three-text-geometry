@@ -33,6 +33,12 @@ describe('BMFontParser', () => {
     expect([font.common.alphaChnl, font.common.redChnl, font.common.greenChnl, font.common.blueChnl]).toEqual([1, 2, 3, 4]);
   });
 
+  test('XML / charset is split into an array', () => {
+    const data = readLocalFile('Roboto-Regular.xml');
+    expect(new BMFontXMLParser().parse(data).info.charset).toEqual([]);
+    expect(new BMFontXMLParser().parse(data.replace('charset=""', 'charset="ANSI"')).info.charset).toEqual(['ANSI']);
+  });
+
   test('XML / Invalid Single Page', () => {
     try {
       const data = readLocalFile('Roboto-Regular-invalid.xml');
@@ -55,6 +61,13 @@ describe('BMFontParser', () => {
     const data = readLocalFile('Roboto-Regular.json');
     const font = new BMFontJsonParser().parse(data);
     expect(isBMFont(font)).toEqual(true);
+  });
+
+  test('Json / charset is passed through as a string or an array', () => {
+    const charset = new BMFontJsonParser().parse(readLocalFile('Roboto-Regular.json')).info.charset;
+    expect(charset).toHaveLength(95);
+    expect(charset.slice(0, 3)).toEqual([' ', '!', '"']);
+    expect(new BMFontJsonParser().parse(readLocalFile('Lato-Regular-32.json')).info.charset).toEqual('');
   });
 
   test('Json / Empty', () => {
@@ -186,6 +199,12 @@ describe('BMFontParser', () => {
     expect(font.info.spacing).toEqual([-8, -8]);
   });
 
+  test('Ascii / charset is kept as a string', () => {
+    const data = readLocalFile('Lato-Regular-32.fnt');
+    expect(new BMFontAsciiParser().parse(data).info.charset).toEqual('');
+    expect(new BMFontAsciiParser().parse(data.replace('charset=""', 'charset="ANSI"')).info.charset).toEqual('ANSI');
+  });
+
   test('Binary / Valid', () => {
     const data = readLocalFile('Arial.bin', true);
     const font = new BMFontBinaryParser().parse(data);
@@ -219,5 +238,9 @@ describe('BMFontParser', () => {
 
   test('Binary / Missing header', () => {
     expect(() => new BMFontBinaryParser().parse(new Uint8Array([0, 0, 0, 3, 0, 0]))).toThrow(new BMFontError('Missing BMF byte header'));
+  });
+
+  test('Binary / charset is not read', () => {
+    expect(new BMFontBinaryParser().parse(readLocalFile('Arial.bin', true)).info.charset).toEqual([]);
   });
 });
