@@ -59,5 +59,11 @@ describe('Utils', () => {
       expect(indices).toBeInstanceOf(Buffer);
       expect(indices.length).toEqual(6);
     });
+    test('Array is typed array', () => {
+      const array = new Uint32Array(12);
+      const indices = createIndices(array, { count: 2 });
+      expect(indices).toBe(array);
+      expect(Array.from(indices)).toEqual([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7]);
+    });
   });
 });

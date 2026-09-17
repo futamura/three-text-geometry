@@ -283,7 +283,7 @@ Parse font data in Binary format
 
 ```TypeScript
 import { BMFontBinaryParser } from 'three-text-geometry'
-const font: BMFont = new BMFontBinaryParser().parse(/** `string` data in ASCII Binary */)
+const font: BMFont = new BMFontBinaryParser().parse(/** `Uint8Array` (including a Node.js `Buffer`) or `ArrayBuffer` data in Binary format */)
 ```
 
 ### <a name="option-list"></a>The value list of `TextGeometryOption`
