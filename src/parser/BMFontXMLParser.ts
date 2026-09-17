@@ -74,7 +74,7 @@ class BMFontXMLParser implements IBMFontParser<string> {
         alphaChnl: +font.common.alphaChnl || 0,
         redChnl: +font.common.redChnl || 0,
         greenChnl: +font.common.greenChnl || 0,
-        blueChnl: +font.common.blueChn || 0,
+        blueChnl: +font.common.blueChnl || 0,
       };
 
       const kernings: BMFontKern[] = font.kernings.kerning.map(
