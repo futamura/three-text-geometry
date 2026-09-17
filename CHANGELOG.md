@@ -1,3 +1,13 @@
+## [5.0.0](https://github.com/futamura/three-text-geometry/compare/4.2.0...5.0.0) (2026-09-17)
+
+### ⚠ BREAKING CHANGES
+
+* BasicTextNodeMaterial, SDFTextNodeMaterial, MSDFTextNodeMaterial, MultiPageTextNodeMaterial, TextMaterialOption, MSDFTextMaterialOption and MultiPageTextMaterialOption are no longer exported from 'three-text-geometry'. Import them from 'three-text-geometry/tsl'.
+
+### Features
+
+* move TSL node materials to the three-text-geometry/tsl subpath ([#161](https://github.com/futamura/three-text-geometry/issues/161)) ([649a603](https://github.com/futamura/three-text-geometry/commit/649a603e965e6f5fdaa3fda0da9f611132b027ff))
+
 ## [4.2.0](https://github.com/futamura/three-text-geometry/compare/4.1.2...4.2.0) (2026-09-17)
 
 ### Features
