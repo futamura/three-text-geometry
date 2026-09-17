@@ -14,7 +14,7 @@
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3",
     "supports-color": "^11.0.0",
-    "three": "^0.185.1",
+    "three": "^0.186.0",
     "three-text-geometry": "file:..",
     "web-vitals": "^6.2.1"
   },
@@ -29,7 +29,7 @@
     "@types/node": "^26.5.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
-    "@types/three": "^0.185.4",
+    "@types/three": "^0.186.0",
     "@typescript-eslint/eslint-plugin": "^8.70.0",
     "@typescript-eslint/parser": "^8.70.0",
     "@typescript-eslint/utils": "^8.70.0",
