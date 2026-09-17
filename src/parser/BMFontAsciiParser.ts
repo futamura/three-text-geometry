@@ -31,27 +31,44 @@ class BMFontAsciiParser implements IBMFontParser<string> {
     const result: BMFont = DefaultBMFont();
 
     lines.forEach((line: string, _index: number) => {
-      line = line.replace(/[\s\t]+/g, ' ').trim();
+      line = line.trim();
       if (!line) return;
 
-      const space = line.indexOf(' ');
+      const space = line.search(/\s/);
       if (space === -1) throw new BMFontError('No page data');
 
       const rootKey = line.substring(0, space);
       const keyValues: any = {};
-      line
-        .substring(space + 1)
-        .replace(/[\s\t]+/g, ' ')
-        .split(' ')
-        .forEach((str: string) => {
-          const arr = str.split('=');
-          const key: string = arr[0] as string;
-          const value: string = arr[1] as string;
-          if (/^-?\d+(?:\.\d*)?$/.test(value)) keyValues[key] = +value;
-          else if (/^[\d,]+/.test(value)) keyValues[key] = value.split(',').map((value) => +value);
-          else if (/^("|').*("|')$/.test(value)) keyValues[key] = value.replace(/^("|')(.*)("|')$/g, '$2');
-          else keyValues[key] = value;
-        });
+      // Quoted values may contain whitespace and '=', so scan key=value pairs instead of splitting on spaces.
+      // A single forward pass keeps parsing linear in the line length.
+      const isSpace = (index: number): boolean => /\s/.test(line.charAt(index));
+      let i = space + 1;
+      while (i < line.length) {
+        if (isSpace(i)) {
+          i++;
+          continue;
+        }
+        const keyStart = i;
+        while (i < line.length && line.charAt(i) !== '=' && !isSpace(i)) i++;
+        if (line.charAt(i) !== '=') continue;
+        const key: string = line.substring(keyStart, i);
+        i++;
+
+        const quote = line.charAt(i);
+        const quoteEnd = quote === '"' || quote === "'" ? line.indexOf(quote, i + 1) : -1;
+        if (quoteEnd !== -1) {
+          keyValues[key] = line.substring(i + 1, quoteEnd);
+          i = quoteEnd + 1;
+          continue;
+        }
+
+        const valueStart = i;
+        while (i < line.length && !isSpace(i)) i++;
+        const value: string = line.substring(valueStart, i);
+        if (/^-?\d+(?:\.\d*)?$/.test(value)) keyValues[key] = +value;
+        else if (/^-?[\d,]+/.test(value)) keyValues[key] = value.split(',').map((value) => +value);
+        else keyValues[key] = value;
+      }
       switch (rootKey) {
         case 'info':
           result.info = keyValues as BMFontInfo;
