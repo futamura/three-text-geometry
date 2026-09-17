@@ -1,3 +1,9 @@
+## [5.0.5](https://github.com/futamura/three-text-geometry/compare/5.0.4...5.0.5) (2026-09-17)
+
+### Bug Fixes
+
+* make BMFontJsonParser validate its input ([#176](https://github.com/futamura/three-text-geometry/issues/176)) ([6a50c29](https://github.com/futamura/three-text-geometry/commit/6a50c294e1539162cd3273a72398a760ed2c58d7)), closes [#173](https://github.com/futamura/three-text-geometry/issues/173)
+
 ## [5.0.4](https://github.com/futamura/three-text-geometry/compare/5.0.3...5.0.4) (2026-09-17)
 
 ### Bug Fixes
