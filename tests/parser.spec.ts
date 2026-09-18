@@ -224,12 +224,18 @@ describe('BMFontParser', () => {
       'page id=0 file="a.png"',
       'char id=32 x=0 y=0 width=1 height=1 xoffset=0 yoffset=0 xadvance=4 page=0 chnl=15',
     ].join('\n');
+    // The budget separates complexity classes, it does not measure speed. The forward pass needs
+    // tens of milliseconds for this input and a quadratic scanner needs tens of seconds, so the
+    // limit sits far above the linear cost. It has to: the same parse takes several hundred
+    // milliseconds once the whole suite runs under --coverage and competes for the CPU, and a
+    // tighter limit would be measuring machine load instead. The explicit timeout keeps this
+    // assertion, rather than Jest's 5s default, as what reports a regression.
     const start = Date.now();
     const font = new BMFontAsciiParser().parse(data);
-    expect(Date.now() - start).toBeLessThan(1000);
+    expect(Date.now() - start).toBeLessThan(5000);
     expect(font.info.face).toEqual('A');
     expect(font.info.padding).toEqual([0, 0, 0, 0]);
-  });
+  }, 20000);
 
   test('Ascii / Negative numeric lists are parsed as arrays', () => {
     const font = new BMFontAsciiParser().parse(readLocalFile('DejaVu-sdf.fnt'));

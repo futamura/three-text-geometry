@@ -3,7 +3,7 @@
  */
 import * as fs from 'fs';
 import { createElement, ReactNode } from 'react';
-import { renderHook, waitFor } from '@testing-library/react';
+import { configure, renderHook, waitFor } from '@testing-library/react';
 import { useFont } from '@three-text-geometry/helpers/hook';
 import { download, loadTexture, parseFont } from '@three-text-geometry/helpers/loader';
 import { BMFontAsciiParser } from '@three-text-geometry/parser';
@@ -14,6 +14,14 @@ import { Texture } from 'three';
 // The loader is covered by loader.spec.ts against a real fetch; jsdom has neither fetch nor
 // TextDecoder, and mocking it here keeps these tests about the hook's own wiring.
 jest.mock('@three-text-geometry/helpers/loader');
+
+// Every wait here is condition-based: the hook settles in about a tenth of a second when nothing is
+// wrong, and the timeout exists only so a broken hook fails instead of hanging. The 1s default that
+// @testing-library/react ships is close enough to the loaded-machine cost of this suite to expire on
+// a healthy run, so both limits are raised well past it. Jest's own timeout has to clear the wait,
+// or it would be the one to fire first.
+configure({ asyncUtilTimeout: 10000 });
+jest.setTimeout(30000);
 
 const FONT_URL = 'https://example.com/Lato-Regular-64.fnt';
 const TEXTURE_URL = 'https://example.com/lato.png';
