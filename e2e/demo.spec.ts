@@ -83,17 +83,21 @@ async function openScene(page: Page, route: string, serveFonts: boolean): Promis
   await routeFonts(page, serveFonts);
   await page.goto(route);
   await page.waitForSelector('canvas');
-  // The axes helper alone already lights pixels, so this only waits for the first painted frame.
-  await expect.poll(() => inkPercent(page), { timeout: 30_000 }).toBeGreaterThan(1);
+  // An element screenshot captures what is composited over the canvas, and two overlays sit there:
+  // stats.js mounts a `position: fixed` panel and the demo's own nav is a MUI Paper. Both are white,
+  // and together they were 3.44% of the frame — most of what the floor used to measure. Hiding them
+  // leaves the floor at the axes helper alone, which is a stable 0.84% on every route.
+  await page.addStyleTag({ content: 'body * { visibility: hidden !important; } canvas { visibility: visible !important; }' });
+  await expect.poll(() => inkPercent(page), { timeout: 30_000 }).toBeGreaterThan(0.5);
 }
 
 for (const route of ROUTES) {
   test(`${route} renders its text`, async ({ page, context }) => {
     // The floor is measured in the same run rather than hardcoded. `OrbitControls autoRotate` keeps
-    // the camera moving, so the lit share drifts from frame to frame — 9.05% to 12.83% across runs
-    // of /simple — and a fixed threshold would be measuring the sampling moment. With the fonts
-    // withheld only the axes helper is drawn, which sits at about 4.55% on every route, against a
-    // worst case of 6.99% once the text is there.
+    // the camera moving, so the lit share drifts from frame to frame and a fixed threshold would be
+    // measuring the sampling moment. With the fonts withheld only the axes helper is drawn: 0.84% on
+    // every route, against 3.32% for the worst frame of the worst route once the text is there. The
+    // multiplier sits between the two, so it also fails a scene that only lays out part of its text.
     const floorPage = await context.newPage();
     await openScene(floorPage, route, false);
     const floor = await inkPercent(floorPage);
@@ -106,7 +110,7 @@ for (const route of ROUTES) {
     await openScene(page, route, true);
 
     // Passes as soon as the glyphs appear, so a slow machine costs time rather than a failure.
-    await expect.poll(() => inkPercent(page), { timeout: 30_000 }).toBeGreaterThan(floor * 1.3);
+    await expect.poll(() => inkPercent(page), { timeout: 30_000 }).toBeGreaterThan(floor * 2);
     expect(errors).toEqual([]);
   });
 }
