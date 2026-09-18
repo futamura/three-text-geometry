@@ -146,26 +146,30 @@ Leave them. Deleting them would touch `src/` and the committed dist to make a nu
 reason above. The `demo-smoke` job does exactly that, and it is part of `tests-result`, so it
 blocks a merge through the check branch protection already names.
 
-It opens `/simple`, `/shuffle` and `/multipage` twice each: once with the fonts withheld, which
-leaves only the axes helper on the canvas, and once with them served, polling until the lit share
-of the canvas beats that floor by 2x. The floor is measured per run rather than hardcoded because
-`OrbitControls autoRotate` keeps the camera moving. Four things to know:
+It opens all five routes twice each: once with the fonts withheld, which leaves only the axes
+helper on the canvas, and once with them served, polling until the lit share of the canvas beats
+that floor by 2x. The floor is measured per run rather than hardcoded because `OrbitControls
+autoRotate` keeps the camera moving. Three things to know:
 
 - **Hide the overlays before measuring.** An element screenshot captures what is composited *over*
   the canvas, and `stats.js` and the demo's MUI nav are white. They were 3.44% of the frame against
   a 4.55% floor — most of what the floor was measuring. `openScene` hides everything but the canvas,
-  which puts the floor at 0.84%.
-- **No WebGPU flag, on purpose.** `--enable-unsafe-webgpu` does give headless Chromium an adapter,
-  but then every route reports `WebGPU Device Lost` and paints an opaque canvas. Without it
-  `THREE.WebGPURenderer` falls back to its WebGL backend and renders with no console errors.
-- **`/shader` and `/shuffleshader` are excluded.** Their material comes from `wgslFn`, so it is raw
-  WGSL that cannot compile on that backend. That needs a working WebGPU adapter, which CI has not.
+  which puts the floor at 0.89%.
+- **The four WebGPU flags go together.** `DemoPage` builds a `THREE.WebGPURenderer`, and the run
+  exercises it rather than a fallback. `--enable-unsafe-webgpu` on its own is worse than useless: it
+  hands out an adapter whose canvas reads back fully transparent, and the demo then reports `WebGPU
+  Device Lost` on every route. Adding `--enable-features=Vulkan --use-vulkan=swiftshader
+  --use-angle=swiftshader` makes it work. With no flags at all `WebGPURenderer` falls back to WebGL,
+  which renders the ordinary scenes but not `/shader` and `/shuffleshader` — their material comes
+  from `wgslFn`, and raw WGSL cannot compile there.
 - **Fonts come from `tests/fonts` through `page.route`,** not from the `raw.githubusercontent.com`
   URLs the scenes carry, so the run is offline and tests the checkout. `fulfill`, not `continue` —
   Playwright refuses to redirect a request to another protocol.
 
 If it ever flakes, lower the multiplier rather than adding a sleep; the poll already waits 30s.
-`/multipage` is the route to watch, since its text covers the least canvas.
+`/multipage` is the route to watch, since its text covers the least canvas: measured over three runs
+each, the floor is 0.89% everywhere and the worst frame with text is 3.56% there, against 4.68% to
+6.17% on the other four.
 
 ## Dependencies
 

@@ -10,10 +10,16 @@ import { defineConfig, devices } from '@playwright/test';
  * cd .. && pnpm e2e
  * ```
  *
- * Chromium runs without a WebGPU flag on purpose. `--enable-unsafe-webgpu` does give the headless
- * browser an adapter, but every route then reports `WebGPU Device Lost` and paints an opaque
- * canvas. Without it `navigator.gpu` has no adapter, `THREE.WebGPURenderer` falls back to its WebGL
- * backend, and the scenes render cleanly.
+ * Chromium is launched with WebGPU on a software Vulkan device, which is what the demo actually
+ * uses: `DemoPage` builds a `THREE.WebGPURenderer`. All four flags are needed together.
+ * `--enable-unsafe-webgpu` alone yields an adapter whose canvas reads back fully transparent — a
+ * minimal clear-to-green page proves it — and the demo then reports `WebGPU Device Lost` on every
+ * route. Adding the Vulkan SwiftShader flags makes the same page read back green and every route
+ * render with no console errors at all.
+ *
+ * Without any of them `navigator.gpu` has no adapter and `WebGPURenderer` falls back to its WebGL
+ * backend. That path works for the scenes with ordinary materials, but not for the two whose
+ * material comes from `wgslFn`, since raw WGSL cannot compile there.
  */
 export default defineConfig({
   testDir: '.',
@@ -25,6 +31,9 @@ export default defineConfig({
   timeout: 90_000,
   use: {
     ...devices['Desktop Chrome'],
+    launchOptions: {
+      args: ['--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-vulkan=swiftshader', '--use-angle=swiftshader'],
+    },
     baseURL: 'http://localhost:4173',
     viewport: { width: 900, height: 700 },
     trace: 'retain-on-failure',

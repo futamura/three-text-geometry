@@ -12,11 +12,10 @@ const RAW = 'https://raw.githubusercontent.com/futamura/three-text-geometry/deve
 const FONTS = path.resolve(__dirname, '../tests/fonts');
 
 /**
- * `/shader` and `/shuffleshader` are deliberately absent: their material comes from `wgslFn`, which
- * embeds raw WGSL, so it cannot compile on the WebGL backend the headless browser falls back to.
- * They fail with `ERROR: 0:82: 'fn' : syntax error` and would need a working WebGPU adapter.
+ * Every route the demo serves. `/shader` and `/shuffleshader` build their material with `wgslFn`, so
+ * it is raw WGSL and only compiles on the WebGPU backend — see the flags in playwright.config.ts.
  */
-const ROUTES = ['/simple', '/shuffle', '/multipage'];
+const ROUTES = ['/simple', '/shuffle', '/shader', '/shuffleshader', '/multipage'];
 
 const CONTENT_TYPES: Record<string, string> = { '.png': 'image/png', '.json': 'application/json', '.xml': 'text/xml', '.bin': 'application/octet-stream' };
 
@@ -95,8 +94,8 @@ for (const route of ROUTES) {
   test(`${route} renders its text`, async ({ page, context }) => {
     // The floor is measured in the same run rather than hardcoded. `OrbitControls autoRotate` keeps
     // the camera moving, so the lit share drifts from frame to frame and a fixed threshold would be
-    // measuring the sampling moment. With the fonts withheld only the axes helper is drawn: 0.84% on
-    // every route, against 3.32% for the worst frame of the worst route once the text is there. The
+    // measuring the sampling moment. With the fonts withheld only the axes helper is drawn: 0.89% on
+    // every route, against 3.56% for the worst frame of the worst route once the text is there. The
     // multiplier sits between the two, so it also fails a scene that only lays out part of its text.
     const floorPage = await context.newPage();
     await openScene(floorPage, route, false);
