@@ -66,9 +66,10 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   demo-smoke:
-    # Not wired into tests-result on purpose: this is the first browser job in the repo, and a
-    # headless GPU stack is the least predictable thing in CI. It must earn its place as a required
-    # check by being green for a while first.
+    # Part of tests-result, so branch protection blocks a merge on it through the one check it
+    # already requires. It went in outside that gate first and stayed green while the margin it
+    # asserts was widened: the floor it compares against was 4.55% and is now 0.84%, which leaves
+    # /multipage, the tightest route, at +97% over the bar instead of +15%.
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -120,13 +121,19 @@ jobs:
 
   tests-result:
     if: always()
-    needs: tests
+    needs:
+      - tests
+      - demo-smoke
     runs-on: ubuntu-latest
     steps:
       - name: Check test results
         run: |
           if [ "${{ needs.tests.result }}" != "success" ]; then
             echo "Tests failed"
+            exit 1
+          fi
+          if [ "${{ needs['demo-smoke'].result }}" != "success" ]; then
+            echo "Demo smoke test failed"
             exit 1
           fi
 
