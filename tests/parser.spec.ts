@@ -136,6 +136,31 @@ describe('BMFontParser', () => {
     expect(font.common).toEqual({ ...DefaultBMFontCommon(), lineHeight: 40 });
   });
 
+  test('XML / A document with no font element is rejected', () => {
+    // `<font></font>` no longer reaches this guard: with trimValues off it parses to a newline
+    // rather than an empty string, so it falls through to the one for `pages` a line below.
+    expect(() => new BMFontXMLParser().parse('<?xml version="1.0"?><notafont/>')).toThrow(new BMFontError('No font data in BMFont file'));
+  });
+
+  test('XML / Optional attributes on chars, kernings and distanceField fall back to zero', () => {
+    const font = new BMFontXMLParser().parse(
+      xmlFont({
+        common: '<common base="30"/>',
+        chars: '<char x="1" y="2" width="3" height="4"/>',
+        kernings: '<kerning amount="-1"/><kerning first="32" second="65"/>',
+        distanceField: '<distanceField fieldType="msdf"/>',
+      }),
+    );
+
+    expect(font.common.lineHeight).toStrictEqual(0);
+    expect(font.chars[0]).toEqual({ id: 0, index: 0, char: '', width: 3, height: 4, xoffset: 0, yoffset: 0, xadvance: 0, chnl: 0, x: 1, y: 2, page: 0 });
+    expect(font.kernings).toEqual([
+      { first: 0, second: 0, amount: -1 },
+      { first: 32, second: 65, amount: 0 },
+    ]);
+    expect(font.distanceField).toEqual({ fieldType: 'msdf', distanceRange: 0 });
+  });
+
   test.each([
     ['pages', { pages: '' }, 'No font data in BMFont file'],
     ['chars', { chars: '' }, 'No chars data in BMFont file'],
