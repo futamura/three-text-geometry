@@ -1,7 +1,7 @@
 {
   "name": "three-text-geometry",
   "description": "Renders BMFont files in ThreeJS with word-wrapping",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "license": "MIT",
   "author": {
     "name": "Kojiro Futamura",

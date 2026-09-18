@@ -1,3 +1,9 @@
+## [5.0.7](https://github.com/futamura/three-text-geometry/compare/5.0.6...5.0.7) (2026-09-18)
+
+### Bug Fixes
+
+* the option setter applies the defaults the constructor applies ([#191](https://github.com/futamura/three-text-geometry/issues/191)) ([42be652](https://github.com/futamura/three-text-geometry/commit/42be652d47eddfd1743d9c4af05bbd28950a618c)), closes [#187](https://github.com/futamura/three-text-geometry/issues/187)
+
 ## [5.0.6](https://github.com/futamura/three-text-geometry/compare/5.0.5...5.0.6) (2026-09-18)
 
 ### Bug Fixes
