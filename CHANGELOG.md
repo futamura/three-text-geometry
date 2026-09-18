@@ -1,3 +1,9 @@
+## [5.0.9](https://github.com/futamura/three-text-geometry/compare/5.0.8...5.0.9) (2026-09-18)
+
+### Bug Fixes
+
+* re-derive the line height when the font changes ([#196](https://github.com/futamura/three-text-geometry/issues/196)) ([885c259](https://github.com/futamura/three-text-geometry/commit/885c2597bcb29d72a0230cb6883c5cb5265c7fa9)), closes [#194](https://github.com/futamura/three-text-geometry/issues/194)
+
 ## [5.0.8](https://github.com/futamura/three-text-geometry/compare/5.0.7...5.0.8) (2026-09-18)
 
 ### Bug Fixes
