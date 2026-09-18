@@ -1,3 +1,9 @@
+## [5.0.6](https://github.com/futamura/three-text-geometry/compare/5.0.5...5.0.6) (2026-09-18)
+
+### Bug Fixes
+
+* copy() no longer leaves the target geometry empty ([#189](https://github.com/futamura/three-text-geometry/issues/189)) ([cc441ca](https://github.com/futamura/three-text-geometry/commit/cc441ca65e9cfa49136415faa8a15f60bfcd636f)), closes [#185](https://github.com/futamura/three-text-geometry/issues/185)
+
 ## [5.0.5](https://github.com/futamura/three-text-geometry/compare/5.0.4...5.0.5) (2026-09-17)
 
 ### Bug Fixes
