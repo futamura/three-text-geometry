@@ -67,8 +67,7 @@ class TextLayout {
    * @param {string} value - The text used in the text layout.
    */
   public set text(value: string) {
-    this._text = value;
-    this.update(value, this._opt);
+    this.update(value);
   }
 
   /**
@@ -215,6 +214,9 @@ class TextLayout {
   /**
    * Updates the text layout with new text and options.
    *
+   * `end` is derived from the text, so a call that changes the text re-derives it, whether or not
+   * it passes an option.
+   *
    * @param {string} text - The text to layout.
    * @param {any} option - The options for the text layout.
    */
@@ -249,6 +251,9 @@ class TextLayout {
       else this._opt.tabSize = 4;
       this._opt.measure = this.computeMetrics.bind(this);
       this._setupSpaceGlyphs(this._opt.font!, this._opt.tabSize!);
+    } else if (text !== undefined) {
+      /** The text changed on its own, so `end` is re-derived the way passing an option would. */
+      this._opt.end = this._text.length;
     }
 
     const font: BMFont = this._opt.font!;

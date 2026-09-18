@@ -92,11 +92,24 @@ describe('TextGeometry', () => {
       expect(geometry.visibleGlyphs.map((glyph) => String.fromCharCode(glyph.data.id)).join('')).toStrictEqual('HowdyWorld');
     });
 
-    test('text setter keeps the end index of the previous text', async () => {
-      /** `end` is resolved once and then carried in the options, so a longer text is clipped. */
+    test('text setter re-derives the end index', async () => {
       const geometry = new TextGeometry('Hello', { font: font });
       geometry.text = 'Hello World';
       expect(geometry.text).toStrictEqual('Hello World');
+      expect(geometry.option.end).toStrictEqual(11);
+      expect(geometry.visibleGlyphs.length).toStrictEqual(10);
+    });
+
+    test('update re-derives the end index when it is given no option', async () => {
+      const geometry = new TextGeometry('Hello', { font: font });
+      geometry.update('Hello World');
+      expect(geometry.option.end).toStrictEqual(11);
+      expect(geometry.visibleGlyphs.length).toStrictEqual(10);
+    });
+
+    test('update without a text leaves the end index alone', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font, end: 5 });
+      geometry.update();
       expect(geometry.option.end).toStrictEqual(5);
       expect(geometry.visibleGlyphs.length).toStrictEqual(5);
     });
@@ -141,6 +154,26 @@ describe('TextGeometry', () => {
       expect(geometry.option.width).toStrictEqual(400);
       expect(geometry.option.mode).toStrictEqual(WordWrapMode.NoWrap);
       expect(geometry.visibleGlyphs.every((glyph) => glyph.line === 0)).toBe(true);
+    });
+
+    test('update takes every field the option carries', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font });
+      const option = {
+        font: font,
+        start: 1,
+        end: 9,
+        width: 500,
+        align: TextAlign.Center,
+        mode: WordWrapMode.Pre,
+        letterSpacing: 3,
+        lineHeight: 50,
+        tabSize: 2,
+        flipY: false,
+        multipage: true,
+      };
+      geometry.update('Howdy World', option);
+      expect(geometry.option).toStrictEqual(option);
+      expect(geometry.attributes.page).toBeDefined();
     });
 
     test('option setter without a font throws', async () => {

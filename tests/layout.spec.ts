@@ -184,11 +184,24 @@ describe('TextLayout', () => {
       expect(layout.glyphs.map((glyph: TextGlyph) => String.fromCharCode(glyph.data.id)).join('')).toStrictEqual('hh');
     });
 
-    test('text setter keeps the end index of the previous text', () => {
-      /** `end` is resolved once and then carried in the options, so a longer text is clipped. */
+    test('text setter re-derives the end index', () => {
       const layout = new TextLayout('xx', { font: font });
       layout.text = 'hhhh';
       expect(layout.text).toStrictEqual('hhhh');
+      expect(layout.option.end).toStrictEqual(4);
+      expect(layout.glyphs.length).toStrictEqual(4);
+    });
+
+    test('update re-derives the end index when it is given no option', () => {
+      const layout = new TextLayout('xx', { font: font });
+      layout.update('hhhh');
+      expect(layout.option.end).toStrictEqual(4);
+      expect(layout.glyphs.length).toStrictEqual(4);
+    });
+
+    test('update without a text leaves the end index alone', () => {
+      const layout = new TextLayout('hhhh', { font: font, end: 2 });
+      layout.update();
       expect(layout.option.end).toStrictEqual(2);
       expect(layout.glyphs.length).toStrictEqual(2);
     });
