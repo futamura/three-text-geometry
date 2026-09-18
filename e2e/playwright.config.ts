@@ -28,7 +28,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   reporter: process.env.CI ? [['github'], ['list']] : [['list']],
-  timeout: 90_000,
+  // Three condition-based waits per test, each with its own generous limit, so this has to clear
+  // their sum. Nothing here sleeps: a healthy route finishes in 5 to 9 seconds.
+  timeout: 180_000,
   use: {
     ...devices['Desktop Chrome'],
     launchOptions: {

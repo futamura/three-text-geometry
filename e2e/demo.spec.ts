@@ -17,6 +17,15 @@ const FONTS = path.resolve(__dirname, '../tests/fonts');
  */
 const ROUTES = ['/simple', '/shuffle', '/shader', '/shuffleshader', '/multipage'];
 
+/**
+ * How long a wait may take before it is treated as a failure rather than a slow machine. Every wait
+ * here polls, so this costs nothing on a healthy run: a route settles in 5 to 9 seconds. It is
+ * generous because `demo-smoke` blocks merges, and because the cost of it being too low is a red
+ * check on work that is fine. Measured over eight local runs, the slowest route took 18.7s while
+ * the machine was busy, so 30s left only 1.6x of room.
+ */
+const WAIT = 60_000;
+
 const CONTENT_TYPES: Record<string, string> = { '.png': 'image/png', '.json': 'application/json', '.xml': 'text/xml', '.bin': 'application/octet-stream' };
 
 /**
@@ -85,9 +94,9 @@ async function openScene(page: Page, route: string, serveFonts: boolean): Promis
   // An element screenshot captures what is composited over the canvas, and two overlays sit there:
   // stats.js mounts a `position: fixed` panel and the demo's own nav is a MUI Paper. Both are white,
   // and together they were 3.44% of the frame — most of what the floor used to measure. Hiding them
-  // leaves the floor at the axes helper alone, which is a stable 0.84% on every route.
+  // leaves the floor at the axes helper alone, which is a stable 0.89% on every route.
   await page.addStyleTag({ content: 'body * { visibility: hidden !important; } canvas { visibility: visible !important; }' });
-  await expect.poll(() => inkPercent(page), { timeout: 30_000 }).toBeGreaterThan(0.5);
+  await expect.poll(() => inkPercent(page), { timeout: WAIT }).toBeGreaterThan(0.5);
 }
 
 for (const route of ROUTES) {
@@ -109,7 +118,7 @@ for (const route of ROUTES) {
     await openScene(page, route, true);
 
     // Passes as soon as the glyphs appear, so a slow machine costs time rather than a failure.
-    await expect.poll(() => inkPercent(page), { timeout: 30_000 }).toBeGreaterThan(floor * 2);
+    await expect.poll(() => inkPercent(page), { timeout: WAIT }).toBeGreaterThan(floor * 2);
     expect(errors).toEqual([]);
   });
 }
