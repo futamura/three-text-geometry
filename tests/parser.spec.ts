@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { BMFontError } from '@three-text-geometry/error';
 import { BMFontAsciiParser, BMFontBinaryParser, BMFontJsonParser, BMFontXMLParser } from '@three-text-geometry/parser';
-import { DefaultBMFontCommon, DefaultBMFontDistanceField, DefaultBMFontInfo, isBMFont } from '@three-text-geometry/types';
+import { BMFont, DefaultBMFontCommon, DefaultBMFontDistanceField, DefaultBMFontInfo, isBMFont } from '@three-text-geometry/types';
 
 function readLocalFile(filePath: string): string;
 function readLocalFile(filePath: string, binary: true): Buffer;
@@ -12,6 +12,30 @@ function readLocalFile(filePath: string, binary?: boolean): string | Buffer {
     return fs.readFileSync(resolved);
   }
   return fs.readFileSync(resolved, 'utf-8');
+}
+
+const XML_SPACE = '<char id="32" x="0" y="0" width="1" height="1" xoffset="0" yoffset="0" xadvance="10" page="0" chnl="15"/>';
+const XML_A = '<char id="65" x="2" y="2" width="3" height="4" xoffset="0" yoffset="0" xadvance="12" page="0" chnl="15"/>';
+const XML_KERNING = '<kerning first="32" second="65" amount="-1"/>';
+const XML_INFO = '<info face="A" size="32" bold="0" italic="0" charset="" unicode="1" stretchH="100" smooth="1" aa="1" padding="0,0,0,0" spacing="0,0"/>';
+const XML_COMMON = '<common lineHeight="40" base="30" scaleW="256" scaleH="256" pages="1" packed="0" alphaChnl="0" redChnl="0" greenChnl="0" blueChnl="0"/>';
+const XML_PAGES = '<pages><page id="0" file="a.png"/></pages>';
+
+/**
+ * A BMFont XML document whose optional parts can be left out, which is what the fixtures in
+ * `tests/fonts` never do.
+ *
+ * @param {object} sections - The parts that differ between the cases below.
+ * @param {string} [sections.info] - The `<info>` element.
+ * @param {string} [sections.common] - The `<common>` element.
+ * @param {string} [sections.pages] - The `<pages>` element.
+ * @param {string} [sections.chars] - The `<char>` elements, wrapped in `<chars>` unless empty.
+ * @param {string} [sections.kernings] - The `<kerning>` elements; a font with no pairs writes no `<kernings>` at all.
+ * @param {string} [sections.distanceField] - The `<distanceField>` element, which only SDF and MSDF generators write.
+ * @returns {string} The XML document.
+ */
+function xmlFont({ info = XML_INFO, common = XML_COMMON, pages = XML_PAGES, chars = XML_SPACE + XML_A, kernings = '', distanceField = '' }: { info?: string; common?: string; pages?: string; chars?: string; kernings?: string; distanceField?: string } = {}): string {
+  return ['<?xml version="1.0"?>', '<font>', info, common, pages, chars === '' ? '' : `<chars count="1">${chars}</chars>`, kernings === '' ? '' : `<kernings count="1">${kernings}</kernings>`, distanceField, '</font>'].join('\n');
 }
 
 describe('BMFontParser', () => {
@@ -55,6 +79,53 @@ describe('BMFontParser', () => {
     } catch (error: any) {
       expect(error instanceof BMFontError).toBe(true);
     }
+  });
+
+  test('XML / A list with a single element is still an array', () => {
+    // fast-xml-parser returns an object rather than a one-element array when a list has one member.
+    const font = new BMFontXMLParser().parse(xmlFont({ chars: XML_SPACE, kernings: XML_KERNING }));
+    expect(font.chars.map((char) => char.id)).toEqual([32]);
+    expect(font.kernings).toEqual([{ first: 32, second: 65, amount: -1 }]);
+  });
+
+  test('XML / Char metrics are numbers, as they are in the other formats', () => {
+    // Attributes are strings until the parser converts them, and the layout matches glyph ids with
+    // `===`, so leaving them as strings made an XML font lay out nothing at all.
+    const byId = (font: BMFont) => [...font.chars].sort((a, b) => a.id - b.id);
+    const xml = new BMFontXMLParser().parse(readLocalFile('Roboto-Regular.xml'));
+    const json = new BMFontJsonParser().parse(readLocalFile('Roboto-Regular.json'));
+
+    expect(byId(xml)).toEqual(byId(json));
+    expect(xml.kernings).toEqual(json.kernings);
+    expect(xml.common).toEqual(json.common);
+  });
+
+  test('XML / A font without kerning pairs writes no kernings element', () => {
+    expect(new BMFontXMLParser().parse(xmlFont()).kernings).toEqual([]);
+  });
+
+  test('XML / A font that is not an SDF atlas writes no distanceField element', () => {
+    expect(new BMFontXMLParser().parse(xmlFont()).distanceField).toEqual(DefaultBMFontDistanceField());
+  });
+
+  test('XML / Optional numeric attributes fall back to zero', () => {
+    const font = new BMFontXMLParser().parse(
+      xmlFont({
+        info: '<info face="A" charset="" padding="0,0,0,0" spacing="0,0"/>',
+        common: '<common lineHeight="40"/>',
+      }),
+    );
+    expect(font.info).toEqual({ ...DefaultBMFontInfo(), face: 'A', padding: [0, 0, 0, 0], spacing: [0, 0] });
+    expect(font.common).toEqual({ ...DefaultBMFontCommon(), lineHeight: 40 });
+  });
+
+  test.each([
+    ['pages', { pages: '' }, 'No font data in BMFont file'],
+    ['chars', { chars: '' }, 'No chars data in BMFont file'],
+    ['info', { info: '' }, 'No info data in BMFont file'],
+    ['common', { common: '' }, 'No common data in BMFont file'],
+  ])('XML / A document without %s is rejected', (_section, sections, message) => {
+    expect(() => new BMFontXMLParser().parse(xmlFont(sections))).toThrow(new BMFontError(message));
   });
 
   test('Json / Valid', () => {
@@ -224,12 +295,18 @@ describe('BMFontParser', () => {
       'page id=0 file="a.png"',
       'char id=32 x=0 y=0 width=1 height=1 xoffset=0 yoffset=0 xadvance=4 page=0 chnl=15',
     ].join('\n');
+    // The budget separates complexity classes, it does not measure speed. The forward pass needs
+    // tens of milliseconds for this input and a quadratic scanner needs tens of seconds, so the
+    // limit sits far above the linear cost. It has to: the same parse takes several hundred
+    // milliseconds once the whole suite runs under --coverage and competes for the CPU, and a
+    // tighter limit would be measuring machine load instead. The explicit timeout keeps this
+    // assertion, rather than Jest's 5s default, as what reports a regression.
     const start = Date.now();
     const font = new BMFontAsciiParser().parse(data);
-    expect(Date.now() - start).toBeLessThan(1000);
+    expect(Date.now() - start).toBeLessThan(5000);
     expect(font.info.face).toEqual('A');
     expect(font.info.padding).toEqual([0, 0, 0, 0]);
-  });
+  }, 20000);
 
   test('Ascii / Negative numeric lists are parsed as arrays', () => {
     const font = new BMFontAsciiParser().parse(readLocalFile('DejaVu-sdf.fnt'));
