@@ -91,8 +91,7 @@ class TextGeometry extends THREE.BufferGeometry {
    * @param {string} value - The text to layout.
    */
   public set text(value: string) {
-    this._text = value;
-    this.update(value, this._opt);
+    this.update(value);
   }
 
   /**
@@ -174,6 +173,8 @@ class TextGeometry extends THREE.BufferGeometry {
    *
    * The option is partial: a field the caller omits keeps the value the geometry already has,
    * unlike the constructor and the `option` setter, which fill an omitted field with its default.
+   * `end` is the exception, because it is derived from the text: a call that changes the text
+   * re-derives it, whether or not it passes an option.
    *
    * @param {string} text - The text to layout.
    * @param {TextGeometryOption} option - The options for the text geometry.
@@ -193,6 +194,9 @@ class TextGeometry extends THREE.BufferGeometry {
       this._opt.tabSize = option.tabSize !== undefined ? option.tabSize : this._opt.tabSize;
       this._opt.flipY = option.flipY !== undefined ? option.flipY : this._opt.flipY;
       this._opt.multipage = option.multipage !== undefined ? option.multipage : this._opt.multipage;
+    } else if (text !== undefined) {
+      /** The text changed on its own, so `end` is re-derived the way passing an option would. */
+      this._opt.end = this._text.length;
     }
 
     /** Determine texture size from font file */
