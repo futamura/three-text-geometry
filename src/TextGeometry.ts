@@ -145,8 +145,10 @@ class TextGeometry extends THREE.BufferGeometry {
   public override copy(source: TextGeometry): this {
     super.copy(source);
 
-    this.text = Object.assign({}, source.text);
-    this.option = Object.assign({}, source.option);
+    /** `source.text` is a string, so it is assigned as-is; spreading it would yield an index object. */
+    this._text = source.text;
+    this._opt = { ...source.option };
+    this.update();
 
     return this;
   }
