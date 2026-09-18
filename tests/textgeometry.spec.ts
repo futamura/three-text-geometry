@@ -176,6 +176,30 @@ describe('TextGeometry', () => {
       expect(geometry.attributes.page).toBeDefined();
     });
 
+    test('update re-derives the line height when the font changes', async () => {
+      const ascii = fs.readFileSync('tests/fonts/Norwester-Multi-64.fnt').toString();
+      const other = new BMFontAsciiParser().parse(ascii);
+      expect(other.common.lineHeight).not.toStrictEqual(font.common.lineHeight);
+      const geometry = new TextGeometry('Hello World', { font: font });
+      expect(geometry.option.lineHeight).toStrictEqual(font.common.lineHeight);
+      geometry.update('Hello World', { font: other });
+      expect(geometry.option.lineHeight).toStrictEqual(other.common.lineHeight);
+    });
+
+    test('update keeps an explicit line height across a font change', async () => {
+      const ascii = fs.readFileSync('tests/fonts/Norwester-Multi-64.fnt').toString();
+      const other = new BMFontAsciiParser().parse(ascii);
+      const geometry = new TextGeometry('Hello World', { font: font });
+      geometry.update('Hello World', { font: other, lineHeight: 50 });
+      expect(geometry.option.lineHeight).toStrictEqual(50);
+    });
+
+    test('update keeps the line height when the font does not change', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font, lineHeight: 50 });
+      geometry.update('Howdy World', { font: font });
+      expect(geometry.option.lineHeight).toStrictEqual(50);
+    });
+
     test('option setter without a font throws', async () => {
       const geometry = new TextGeometry('Hello World', { font: font });
       expect(() => {
