@@ -71,8 +71,8 @@ class TextGeometry extends THREE.BufferGeometry {
    * @param {TextGeometryOption} value - The options for the text geometry.
    */
   public set option(value: TextGeometryOption) {
-    this._opt = { ...value };
-    this.update(this._text, value);
+    this.applyOption(value, 'option');
+    this.update();
   }
 
   /**
@@ -115,11 +115,29 @@ class TextGeometry extends THREE.BufferGeometry {
    */
   constructor(text: string, option: TextGeometryOption = {}) {
     super();
+    this._text = text;
+    this.applyOption(option, 'constructor');
+    this.update();
+    // if (this.attributes.position) this.attributes.position.needsUpdate = true;
+  }
+
+  /**
+   * The function to store a complete option, filling every field the caller omits with its default.
+   *
+   * This is what the constructor and the `option` setter share, so that setting `option` leaves the
+   * geometry in the state constructing it with that option would. `update()` keeps its own partial
+   * semantics, where an omitted field carries the current value over.
+   *
+   * @param {TextGeometryOption} option - The options for the text geometry.
+   * @param {string} caller - The accessor reported in the error log when no font is given.
+   * @throws {TypeError} If the font is not specified in options.
+   * @memberof TextGeometry
+   */
+  private applyOption(option: TextGeometryOption, caller: string) {
     if (option.font === undefined) {
-      console.error('[TextGeometry:constructor]', text?.substring(0, 30), option);
+      console.error(`[TextGeometry:${caller}]`, this._text?.substring(0, 30), option);
       throw new TypeError('Must specify a `font` in options');
     }
-    this._text = text;
     this._opt.font = option.font;
     this._opt.start = option.start !== undefined ? Math.max(0, option.start) : 0;
     this._opt.end = option.end !== undefined ? option.end : this._text.length;
@@ -131,8 +149,6 @@ class TextGeometry extends THREE.BufferGeometry {
     this._opt.tabSize = option.tabSize !== undefined ? option.tabSize : 4;
     this._opt.flipY = option.flipY !== undefined ? option.flipY : true;
     this._opt.multipage = option.multipage !== undefined ? option.multipage : false;
-    this.update(this._text, this._opt);
-    // if (this.attributes.position) this.attributes.position.needsUpdate = true;
   }
 
   /**
@@ -156,6 +172,9 @@ class TextGeometry extends THREE.BufferGeometry {
   /**
    * The function to update the text.
    *
+   * The option is partial: a field the caller omits keeps the value the geometry already has,
+   * unlike the constructor and the `option` setter, which fill an omitted field with its default.
+   *
    * @param {string} text - The text to layout.
    * @param {TextGeometryOption} option - The options for the text geometry.
    * @memberof TextGeometry
@@ -174,11 +193,6 @@ class TextGeometry extends THREE.BufferGeometry {
       this._opt.tabSize = option.tabSize !== undefined ? option.tabSize : this._opt.tabSize;
       this._opt.flipY = option.flipY !== undefined ? option.flipY : this._opt.flipY;
       this._opt.multipage = option.multipage !== undefined ? option.multipage : this._opt.multipage;
-    }
-
-    if (this._opt.font === undefined) {
-      console.error('[TextGeometry:update]', text?.substring(0, 30), option);
-      throw new TypeError('Must specify a `font` in options');
     }
 
     /** Determine texture size from font file */
