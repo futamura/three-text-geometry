@@ -84,11 +84,80 @@ describe('TextGeometry', () => {
       const geometry = new TextGeometry('Hello World', { font: font });
       expect(geometry).toBeInstanceOf(TextGeometry);
     });
+
+    test('text setter re-runs the layout', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font });
+      geometry.text = 'Howdy World';
+      expect(geometry.text).toStrictEqual('Howdy World');
+      expect(geometry.visibleGlyphs.map((glyph) => String.fromCharCode(glyph.data.id)).join('')).toStrictEqual('HowdyWorld');
+    });
+
+    test('text setter keeps the end index of the previous text', async () => {
+      /** `end` is resolved once and then carried in the options, so a longer text is clipped. */
+      const geometry = new TextGeometry('Hello', { font: font });
+      geometry.text = 'Hello World';
+      expect(geometry.text).toStrictEqual('Hello World');
+      expect(geometry.option.end).toStrictEqual(5);
+      expect(geometry.visibleGlyphs.length).toStrictEqual(5);
+    });
+
+    test('option setter replaces the whole option', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font, align: TextAlign.Right, letterSpacing: 8 });
+      geometry.option = { font: font, letterSpacing: 4 };
+      expect(geometry.option.letterSpacing).toStrictEqual(4);
+      /** Unlike the constructor, the setter does not re-apply the defaults for the fields it drops. */
+      expect(geometry.option.align).toBeUndefined();
+      expect(geometry.option.flipY).toBeUndefined();
+      expect(geometry.visibleGlyphs.length).toStrictEqual(10);
+    });
+
+    test('option setter without a font throws', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font });
+      expect(() => {
+        geometry.option = { letterSpacing: 4 };
+      }).toThrow(new TypeError('Must specify a `font` in options'));
+    });
+
+    test('copy returns the target geometry', async () => {
+      const source = new TextGeometry('Hello World', { font: font });
+      const target = new TextGeometry('Hello Universe', { font: font });
+      expect(target.copy(source)).toBe(target);
+    });
   });
 
   describe('Three.js', () => {
     test('Renderer should be exist', async () => {
       expect(renderer).not.toBeNull();
+    });
+
+    test('Toggling multipage adds and removes the page attribute', async () => {
+      const ascii = fs.readFileSync('tests/fonts/Norwester-Multi-64.fnt').toString();
+      const multiFont = new BMFontAsciiParser().parse(ascii);
+      const text = 'This bitmap text';
+      const geometry = new TextGeometry(text, { font: multiFont, multipage: true });
+      expect(geometry.attributes.page).toBeDefined();
+      geometry.update(text, { font: multiFont, multipage: false });
+      expect(geometry.attributes.page).toBeUndefined();
+      geometry.update(text, { font: multiFont, multipage: true });
+      expect(geometry.attributes.page).toBeDefined();
+    });
+
+    test('Empty text yields an empty bounding box and sphere', async () => {
+      const geometry = new TextGeometry('', { font: font });
+      expect(geometry.visibleGlyphs.length).toStrictEqual(0);
+      geometry.computeBoundingBox();
+      expect(geometry.boundingBox?.isEmpty()).toBe(true);
+      geometry.computeBoundingSphere();
+      expect(geometry.boundingSphere?.radius).toStrictEqual(0);
+      expect(geometry.boundingSphere?.center.toArray()).toStrictEqual([0, 0, 0]);
+    });
+
+    test('NaN positions report a NaN radius', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font });
+      (geometry.attributes.position!.array as Float32Array)[0] = NaN;
+      geometry.computeBoundingSphere();
+      expect(geometry.boundingSphere?.radius).toBeNaN();
+      expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Computed radius is NaN'));
     });
 
     test('Text Geometry', async () => {
