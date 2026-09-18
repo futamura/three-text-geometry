@@ -96,6 +96,7 @@ export default tseslint.config(
     files: [
       'src/**/*.{ts,tsx}',
       'tests/**/*.{ts,tsx}',
+      'e2e/**/*.{ts,tsx}',
     ],
     ignores: [
       ".yalc",

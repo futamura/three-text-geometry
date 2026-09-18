@@ -58,6 +58,59 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  demo-smoke:
+    # Not wired into tests-result on purpose: this is the first browser job in the repo, and a
+    # headless GPU stack is the least predictable thing in CI. It must earn its place as a required
+    # check by being green for a while first.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Install Node.js 24.x
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install Chromium
+        run: pnpm e2e-install
+
+      # The demo depends on this package through `file:..`, which pnpm copies at install time, so it
+      # has to be reinstalled after the library is rebuilt or it keeps running the previous build.
+      - name: Build the library
+        run: pnpm build
+
+      - name: Install demo dependencies
+        run: pnpm install --force
+        working-directory: demo
+
+      - name: Build the demo
+        run: pnpm build
+        working-directory: demo
+
+      - name: Smoke test the demo
+        run: pnpm e2e
+
+      - name: Upload the trace of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-trace
+          path: test-results/
+          retention-days: 7
+
   tests-result:
     if: always()
     needs: tests
