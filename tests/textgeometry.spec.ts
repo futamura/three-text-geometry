@@ -123,6 +123,26 @@ describe('TextGeometry', () => {
       const target = new TextGeometry('Hello Universe', { font: font });
       expect(target.copy(source)).toBe(target);
     });
+
+    test('copy reproduces the text, the options and the geometry', async () => {
+      const source = new TextGeometry('Hello World', { font: font, align: TextAlign.Right, letterSpacing: 2, width: 400 });
+      const target = new TextGeometry('Hello Universe', { font: font });
+      target.copy(source);
+      expect(target.text).toStrictEqual('Hello World');
+      expect(target.option).toStrictEqual(source.option);
+      expect(target.visibleGlyphs.length).toStrictEqual(source.visibleGlyphs.length);
+      expect(target.attributes.position?.array).toStrictEqual(source.attributes.position?.array);
+      expect(target.attributes.uv?.array).toStrictEqual(source.attributes.uv?.array);
+    });
+
+    test('copy leaves the source untouched', async () => {
+      const source = new TextGeometry('Hello World', { font: font });
+      const target = new TextGeometry('Hello Universe', { font: font });
+      target.copy(source);
+      target.text = 'Goodbye Wor';
+      expect(source.text).toStrictEqual('Hello World');
+      expect(source.visibleGlyphs.length).toStrictEqual(10);
+    });
   });
 
   describe('Three.js', () => {
