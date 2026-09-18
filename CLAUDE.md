@@ -166,7 +166,9 @@ autoRotate` keeps the camera moving. Three things to know:
   URLs the scenes carry, so the run is offline and tests the checkout. `fulfill`, not `continue` —
   Playwright refuses to redirect a request to another protocol.
 
-If it ever flakes, lower the multiplier rather than adding a sleep; the poll already waits 30s.
+If it ever flakes, lower the multiplier rather than adding a sleep; each poll already waits 60s,
+inside a 180s per-test timeout. Both were raised in #215 after three of forty route-tests went past
+17s on a loaded machine; the waits poll, so a healthy run costs the same.
 `/multipage` is the route to watch, since its text covers the least canvas: measured over three runs
 each, the floor is 0.89% everywhere and the worst frame with text is 3.56% there, against 4.68% to
 6.17% on the other four.
