@@ -105,10 +105,42 @@ describe('TextGeometry', () => {
       const geometry = new TextGeometry('Hello World', { font: font, align: TextAlign.Right, letterSpacing: 8 });
       geometry.option = { font: font, letterSpacing: 4 };
       expect(geometry.option.letterSpacing).toStrictEqual(4);
-      /** Unlike the constructor, the setter does not re-apply the defaults for the fields it drops. */
-      expect(geometry.option.align).toBeUndefined();
-      expect(geometry.option.flipY).toBeUndefined();
+      /** The fields the new option drops fall back to the defaults, exactly as in the constructor. */
+      expect(geometry.option.align).toStrictEqual(TextAlign.Left);
+      expect(geometry.option.flipY).toStrictEqual(true);
       expect(geometry.visibleGlyphs.length).toStrictEqual(10);
+    });
+
+    test('option setter applies the same defaults as the constructor', async () => {
+      const text = 'Hello World';
+      const geometry = new TextGeometry(text, { font: font, align: TextAlign.Right, letterSpacing: 8, width: 400, tabSize: 2, flipY: false, multipage: true });
+      geometry.option = { font: font };
+      const constructed = new TextGeometry(text, { font: font });
+      expect(geometry.option).toStrictEqual(constructed.option);
+      expect(geometry.attributes.uv?.array).toStrictEqual(constructed.attributes.uv?.array);
+      expect(geometry.attributes.position?.array).toStrictEqual(constructed.attributes.position?.array);
+    });
+
+    test('update keeps the fields the option omits', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font, align: TextAlign.Right, letterSpacing: 8, tabSize: 2, flipY: false, multipage: true, mode: WordWrapMode.Pre, lineHeight: 42 });
+      geometry.update('Howdy World', { font: font });
+      expect(geometry.option.align).toStrictEqual(TextAlign.Right);
+      expect(geometry.option.letterSpacing).toStrictEqual(8);
+      expect(geometry.option.tabSize).toStrictEqual(2);
+      expect(geometry.option.flipY).toStrictEqual(false);
+      expect(geometry.option.multipage).toStrictEqual(true);
+      expect(geometry.option.mode).toStrictEqual(WordWrapMode.Pre);
+      expect(geometry.option.lineHeight).toStrictEqual(42);
+      expect(geometry.text).toStrictEqual('Howdy World');
+    });
+
+    test('update takes width and mode and tolerates an option without a font', async () => {
+      const geometry = new TextGeometry('this bitmap text is rendered with an OrthographicCamera', { font: font });
+      geometry.update(undefined, { width: 400, mode: WordWrapMode.NoWrap });
+      expect(geometry.option.font).toStrictEqual(font);
+      expect(geometry.option.width).toStrictEqual(400);
+      expect(geometry.option.mode).toStrictEqual(WordWrapMode.NoWrap);
+      expect(geometry.visibleGlyphs.every((glyph) => glyph.line === 0)).toBe(true);
     });
 
     test('option setter without a font throws', async () => {
@@ -170,6 +202,15 @@ describe('TextGeometry', () => {
       geometry.computeBoundingSphere();
       expect(geometry.boundingSphere?.radius).toStrictEqual(0);
       expect(geometry.boundingSphere?.center.toArray()).toStrictEqual([0, 0, 0]);
+    });
+
+    test('Without a position attribute the bounds are left alone', async () => {
+      const geometry = new TextGeometry('Hello World', { font: font });
+      geometry.deleteAttribute('position');
+      geometry.computeBoundingBox();
+      geometry.computeBoundingSphere();
+      expect(geometry.boundingBox?.isEmpty()).toBe(true);
+      expect(geometry.boundingSphere?.radius).toStrictEqual(-1);
     });
 
     test('NaN positions report a NaN radius', async () => {

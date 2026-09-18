@@ -10,6 +10,7 @@ declare class TextGeometry extends THREE.BufferGeometry {
     set text(value: string);
     get visibleGlyphs(): TextGlyph[];
     constructor(text: string, option?: TextGeometryOption);
+    private applyOption;
     copy(source: TextGeometry): this;
     update(text?: string, option?: TextGeometryOption): void;
     computeBoundingSphere(): void;
