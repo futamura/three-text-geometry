@@ -1,3 +1,9 @@
+## [5.0.10](https://github.com/futamura/three-text-geometry/compare/5.0.9...5.0.10) (2026-09-18)
+
+### Bug Fixes
+
+* parse XML fonts into the same shape as the other formats ([#203](https://github.com/futamura/three-text-geometry/issues/203)) ([083c637](https://github.com/futamura/three-text-geometry/commit/083c637243d704864118b3e51168a6cfbaf5268a)), closes [#202](https://github.com/futamura/three-text-geometry/issues/202)
+
 ## [5.0.9](https://github.com/futamura/three-text-geometry/compare/5.0.8...5.0.9) (2026-09-18)
 
 ### Bug Fixes
