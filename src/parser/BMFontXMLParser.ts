@@ -1,7 +1,19 @@
 import { XMLParser } from 'fast-xml-parser';
 
 import { BMFontError } from '../error';
-import { BMFont, BMFontChar, BMFontCommon, BMFontInfo, BMFontKern, IBMFontParser } from '../types';
+import { BMFont, BMFontChar, BMFontCommon, BMFontInfo, BMFontKern, DefaultBMFontDistanceField, IBMFontParser } from '../types';
+
+/**
+ * Reads a list that fast-xml-parser leaves unwrapped when it holds a single element, and that is
+ * missing altogether when the document omits its section.
+ *
+ * @param {T | T[] | undefined} value - The parsed `<char>`, `<kerning>` or `<page>` elements.
+ * @returns {T[]} The elements as an array, empty when the section was absent.
+ */
+function toArray<T>(value: T | T[] | undefined): T[] {
+  if (value === undefined) return [];
+  return Array.isArray(value) ? value : [value];
+}
 
 /**
  * The class for parsing font data in XML format.
@@ -29,6 +41,9 @@ class BMFontXMLParser implements IBMFontParser<string> {
       const options = {
         ignoreAttributes: false,
         attributeNamePrefix: '',
+        // A quoted value keeps its whitespace, the way BMFontAsciiParser keeps it: the space glyph
+        // is written as char=" " and would otherwise arrive as an empty string.
+        trimValues: false,
       };
       const parser = new XMLParser(options);
       const json: any = parser.parse(xml);
@@ -39,14 +54,28 @@ class BMFontXMLParser implements IBMFontParser<string> {
       if (!font.info) throw new BMFontError('No info data in BMFont file');
       if (!font.common) throw new BMFontError('No common data in BMFont file');
 
-      let pages: string[];
-      if (Array.isArray(font.pages.page)) {
-        pages = font.pages.page.map((element: any) => element.file);
-      } else {
-        pages = [font.pages.page.file];
-      }
+      const pages: string[] = toArray<any>(font.pages.page).map((element: any) => element.file);
 
-      const chars: BMFontChar[] = font.chars.char.map((element: object) => element);
+      // Attributes arrive as strings. The layout matches glyphs with `===` against a numeric id and
+      // does arithmetic on the metrics, so an uncoerced char makes an XML font lay out nothing at
+      // all. Every field but `char` is converted the way the kernings below are.
+      const chars: BMFontChar[] = toArray<any>(font.chars.char).map(
+        (element: any) =>
+          ({
+            id: +element.id || 0,
+            index: +element.index || 0,
+            char: `${element.char ?? ''}`,
+            width: +element.width || 0,
+            height: +element.height || 0,
+            xoffset: +element.xoffset || 0,
+            yoffset: +element.yoffset || 0,
+            xadvance: +element.xadvance || 0,
+            chnl: +element.chnl || 0,
+            x: +element.x || 0,
+            y: +element.y || 0,
+            page: +element.page || 0,
+          }) as BMFontChar,
+      );
 
       const info: BMFontInfo = {
         face: font.info.face,
@@ -77,7 +106,10 @@ class BMFontXMLParser implements IBMFontParser<string> {
         blueChnl: +font.common.blueChnl || 0,
       };
 
-      const kernings: BMFontKern[] = font.kernings.kerning.map(
+      // A font with no kerning pairs writes no <kernings> at all, and only SDF and MSDF generators
+      // write a <distanceField>. Both are absent from a plain BMFont document, so both default the
+      // way the JSON parser defaults them.
+      const kernings: BMFontKern[] = toArray<any>(font.kernings?.kerning).map(
         (element: any) =>
           ({
             first: +element.first || 0,
@@ -86,10 +118,12 @@ class BMFontXMLParser implements IBMFontParser<string> {
           }) as BMFontKern,
       );
 
-      const distanceField = {
-        fieldType: font.distanceField.fieldType,
-        distanceRange: +font.distanceField.distanceRange || 0,
-      };
+      const distanceField = font.distanceField
+        ? {
+            fieldType: font.distanceField.fieldType,
+            distanceRange: +font.distanceField.distanceRange || 0,
+          }
+        : DefaultBMFontDistanceField();
 
       const bmFont: BMFont = {
         pages: pages,
