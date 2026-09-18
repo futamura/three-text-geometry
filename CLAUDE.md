@@ -39,6 +39,36 @@ Run a single test file: `pnpm jest tests/parser.spec.ts`
 
 **Utilities** (`src/utils/`): `vertices.ts` (position/UV extraction), `quad-indices.ts` (index buffer generation), `compute.ts` (bounding box/sphere), `binary.ts` (binary data parsing).
 
+### How the option is resolved, and the four bugs that came from getting it wrong
+
+`TextGeometry` normalizes options in two different ways on purpose, and 5.0.6–5.0.9 were all one
+class of mistake in this area. Read this before touching `update()`, `applyOption()` or either
+setter.
+
+- The constructor and the `option` setter **normalize fully**: every field the caller omits is
+  filled with its default. They share `private applyOption(option, caller)`, which is also the only
+  place `_opt.font` is written and the only place a missing font is rejected.
+- `update(text?, option?)` **merges partially**: a field the caller omits keeps the value the
+  geometry already has. Do not "unify" these — a partial `update()` is the point of the method, and
+  making the setter partial is what #187 was.
+- Fields **derived from another field** are the exception to the merge, because a stale derived
+  value is invisible until it renders wrong. `end` comes from the text, so any call that changes the
+  text re-derives it (#186); `lineHeight` comes from the font, so a call that changes the font
+  re-derives it unless it passes a `lineHeight` of its own (#194). `update()` with neither argument
+  touches no option at all — the constructor, `copy()` and the `option` setter depend on that.
+- A new option field that defaults from another one needs the same treatment. The failure mode is
+  always the same shape: the default is computed once, written into `_opt`, and then read back as
+  its own fallback on the next `update()`.
+- `TextLayout.update()` has its own rule — with an option it re-applies the literal defaults, which
+  is why it never had #187 or #194 but did have #186 through its `text` setter. The two classes
+  agree on behaviour now, not on implementation.
+- `copy()` assigns `_text`/`_opt` and calls `update()` once. It went through the two setters before
+  5.0.6, which spread the source string into an index object and left the target empty (#185).
+
+`tests/textgeometry.spec.ts` pins each of these; `update keeps the fields the option omits` and
+`update takes every field the option carries` exist to keep the partial path covered, since nothing
+else calls `update()` with a full option any more.
+
 ## Build Output
 
 Dual format: CommonJS (`dist-cjs/`, ES2018) and ESM (`dist-esm/`, ES2020). Both configured via separate tsconfig files (`tsconfig.cjs.json`, `tsconfig.esm.json`), and both compile with plain `tsc` — there are no transformer plugins.
