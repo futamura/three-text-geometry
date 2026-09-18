@@ -16,12 +16,18 @@
  * publishes, since the release job does not build - through the package's own
  * `exports` and `sideEffects`, and checks the output.
  *
+ * It also checks that every package the dist imports is declared. Bundling
+ * cannot catch that on its own: every other package is externalized here, so an
+ * undeclared import resolves fine and only breaks in a consumer's install. That
+ * is how 5.0.1's `axios` import reached npm.
+ *
  * Usage: node scripts/verify-tree-shaking.mjs [packageDir]
  *
  *   packageDir  Optional. Check this unpacked package instead of the repo, e.g.
  *               a published tarball, to confirm this check still detects a leak.
  */
 
+import { builtinModules } from 'node:module'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -65,6 +71,51 @@ const scenarios = [
   },
 ]
 
+/* `require("x")`, `import("x")` and `from"x"`, as uglify leaves them - no space, either quote. */
+const SPECIFIER = /(?:require|import)\s*\(\s*["']([^"']+)["']\s*\)|(?:from|import)\s*["']([^"']+)["']/g
+
+/**
+ * The packages every .js file under the published dist directories imports, each with the first file that imports it.
+ *
+ * @returns {Map<string, string>} Package name to the repo-relative file importing it.
+ */
+function importedPackages() {
+  const found = new Map()
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        walk(full)
+        continue
+      }
+      if (!entry.name.endsWith('.js')) continue
+      for (const match of fs.readFileSync(full, 'utf8').matchAll(SPECIFIER)) {
+        const specifier = match[1] ?? match[2]
+        /* Relative and absolute specifiers resolve inside the package itself. */
+        if (specifier.startsWith('.') || specifier.startsWith('/')) continue
+        /* A subpath such as three/webgpu is served by the package it belongs to. */
+        const segments = specifier.split('/')
+        const name = specifier.startsWith('@') ? segments.slice(0, 2).join('/') : segments[0]
+        if (!found.has(name)) found.set(name, path.relative(root, full))
+      }
+    }
+  }
+  for (const dir of (pkg.files ?? []).map((entry) => path.join(root, entry))) {
+    if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) walk(dir)
+  }
+  return found
+}
+
+/**
+ * The imported packages that the manifest does not declare.
+ *
+ * @returns {Array<[string, string]>} Undeclared package names with the file importing each.
+ */
+function undeclaredImports() {
+  const declared = new Set([...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {}), ...builtinModules, ...builtinModules.map((name) => `node:${name}`)])
+  return [...importedPackages()].filter(([name]) => !declared.has(name))
+}
+
 let failed = 0
 try {
   for (const scenario of scenarios) {
@@ -99,6 +150,16 @@ try {
     console.error('FAIL  dist-cjs/index.js references the TSL materials')
   } else {
     console.log('ok    dist-cjs/index.js does not reference the TSL materials')
+  }
+
+  /* An import the package does not declare resolves in this repo and breaks in a consumer's install. */
+  const undeclared = undeclaredImports()
+  if (undeclared.length > 0) {
+    failed++
+    console.error('FAIL  every package the dist imports is declared')
+    for (const [name, file] of undeclared) console.error(`      - ${name} (imported by ${file}) is in neither dependencies nor peerDependencies`)
+  } else {
+    console.log('ok    every package the dist imports is declared')
   }
 } finally {
   fs.rmSync(consumer, { recursive: true, force: true })

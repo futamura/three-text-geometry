@@ -35,6 +35,8 @@ Run a single test file: `pnpm jest tests/parser.spec.ts`
 
 **React integration:** `src/helpers/fiber.ts` extends R3F for `<textGeometry>` JSX usage. `src/helpers/hook.ts` provides React hooks.
 
+**Loading** (`src/helpers/loader.ts`): `download` (`fetch` plus progress), `parseFont` (picks the parser from the URL extension) and `loadTexture` (object URL through `TextureLoader`), used by the `useFont` hook. It is internal — not exported from either entry point. It uses `fetch`, `DataView`/`TextDecoder` and `URL.createObjectURL` on purpose: 5.0.1 removed the `axios` and `tslib` imports rather than declaring them, so the package's only runtime `dependencies` are `ajv`, `fast-xml-parser` and `swr`.
+
 **Utilities** (`src/utils/`): `vertices.ts` (position/UV extraction), `quad-indices.ts` (index buffer generation), `compute.ts` (bounding box/sphere), `binary.ts` (binary data parsing).
 
 ## Build Output
@@ -50,6 +52,7 @@ The release job runs `pnpm semantic-release` without building, so the tarball co
 - `.` (`src/index.ts`) must not reach `src/materials/`. The TSL node materials import `three/webgpu` and `three/tsl`, and re-exporting them from the root put the WebGPU renderer (~87 KB gzip) in every consumer's bundle in 4.x. They live on the `./tsl` subpath (`src/tsl.ts`) since 5.0.0.
 - `sideEffects` lists `dist-*/index.js` as well as `dist-*/helpers/fiber.js`. `import 'three-text-geometry'` exists to run `extend({ TextGeometry })`; if the index is marked side-effect free, a bundler drops that bare import before it ever reaches fiber.
 - `pnpm verify-tree-shaking` bundles both cases from the committed dist with esbuild and runs in the `tests` job of both workflows. `node scripts/verify-tree-shaking.mjs <unpacked-tarball>` checks a published version; against 4.2.0 it fails, which is how to confirm the check still detects a leak.
+- The same script also checks that every package the dist imports is in `dependencies` or `peerDependencies`. The bundling scenarios cannot catch that, because they externalize every other package — an undeclared import resolves against the repo's own `node_modules` and only breaks in a consumer's install, which is how `axios` shipped in 4.x. Against the 4.2.0 tarball it names both `axios` and the `tslib` that `importHelpers` used to inline.
 
 The `@three-text-geometry/*` → `./src/*` aliases in `compilerOptions.paths` are used by `tests/` only; `src/` imports relatively, so the build has nothing to rewrite. Jest resolves the aliases through `pathsToModuleNameMapper` in `jest.config.ts`, which reads that same `paths` block — keep it even though the build does not need it.
 
@@ -62,10 +65,33 @@ The `@three-text-geometry/*` → `./src/*` aliases in `compilerOptions.paths` ar
 
 ## Testing
 
-- Jest 30 with ts-jest, jsdom environment
+- Jest 30 with ts-jest. `jest.config.ts` sets `testEnvironment: 'node'`; the specs that need a DOM opt in with a `@jest-environment jsdom` docblock
 - Tests in `tests/*.spec.ts`, test fonts in `tests/fonts/`
-- WebGL mocked via `tests/helpers/webgl-mock.ts` (no real GPU needed)
+- WebGL mocked via `tests/helpers/webgl-mock.ts`, WebGPU via `tests/helpers/webgpu-mock.ts` (no real GPU needed)
 - CI runs tests with xvfb-run on Ubuntu (libgl1-mesa-dev for headless GL)
+- `tsconfig.json` sets no `lib` or `target`, so newer library methods (`Array.prototype.at`, for one) do not typecheck in tests, and `fs.readFileSync` yields a `Uint8Array<ArrayBufferLike>` that is not assignable to `BlobPart`
+- ESLint's `jsdoc/require-*` rules apply to `tests/` as well, including local helper functions
+
+### What jsdom does not provide
+
+`fetch`, `Response`, `ReadableStream`, `TextDecoder` and `URL.createObjectURL` are all missing (`Headers`, `Blob` and `URL` are there). So `loader.spec.ts` — which mocks `globalThis.fetch` and exercises the real `src/helpers/loader.ts` — has to stay in the node environment, and that style cannot be reused in a jsdom spec without polyfills.
+
+`hook.spec.ts` therefore mocks `@three-text-geometry/helpers/loader` (Jest resolves the alias to the same module the hook reaches through `./loader`) and tests what is otherwise untested: the SWR keys, the progress aggregation across both items, and error surfacing. Wrap `renderHook` in `SWRConfig` with `provider: () => new Map()`, because SWR's cache is module state and leaks between tests.
+
+### Testing the R3F registration
+
+`fiber.spec.ts` renders `<textGeometry>` with `@react-three/test-renderer`, which needs no GPU in jsdom. Four things to know:
+
+- Do **not** import `tests/helpers/webgl-mock` there. It replaces `THREE.WebGLRenderer` wholesale and fights the test renderer, which brings its own canvas and context
+- Set `globalThis.IS_REACT_ACT_ENVIRONMENT = true`, or every render logs `The current testing environment is not configured to support act(...)`
+- The geometry is **not** `findByType('TextGeometry')` — the test tree names it `bufferGeometry`. Assert through `renderer.scene.children[0].instance.geometry`
+- The R3F catalog is module state, so a test for the unregistered case (it rejects with `R3F: TextGeometry is not part of the THREE namespace!`) must run before anything in that file imports `helpers/fiber`
+
+`react-dom` is held at 19.2.8: `@react-three/fiber@9.7.0` declares `react-dom >=19 <19.3`, so 19.3.0 makes `pnpm install` report an unmet peer. Keep `@types/react-dom` on 19.2.x to match `@types/react`.
+
+### Checking a change in the demo
+
+`demo/` depends on the library through `file:..`, which pnpm **copies** at install time rather than linking. After rebuilding the dist, run `pnpm install --force` in `demo/` and start Vite with `--force`, or the demo keeps running the previous build.
 
 ## Dependencies
 
