@@ -141,7 +141,8 @@ Leave them. Deleting them would touch `src/` and the committed dist to make a nu
 
 ### Smoke-testing the demo
 
-`e2e/` holds the only test that looks at a rendered pixel. `pnpm e2e-install` once, then
+`e2e/` holds the only tests that look at a rendered pixel — `demo.spec.ts` for the five routes and
+`formats.spec.ts` for the four font formats. `pnpm e2e-install` once, then
 `pnpm e2e`; it needs the library built and `demo/` reinstalled and built first, for the `file:..`
 reason above. The `demo-smoke` job does exactly that, and it is part of `tests-result`, so it
 blocks a merge through the check branch protection already names.
@@ -172,6 +173,32 @@ inside a 180s per-test timeout. Both were raised in #215 after three of forty ro
 `/multipage` is the route to watch, since its text covers the least canvas: measured over three runs
 each, the floor is 0.89% everywhere and the worst frame with text is 3.56% there, against 4.68% to
 6.17% on the other four.
+
+### The four font formats in a browser
+
+`demo.spec.ts` covers the scenes as the demo ships them, and those load JSON and ASCII only, so XML
+and binary reached a real browser through nothing — the gap #202 fell through. `formats.spec.ts`
+closes it by rendering one case per format through `/simple`, which takes the font and the atlas as
+query parameters; `helpers.ts` holds the interception, the ink measurement and `openScene`, shared
+by both specs.
+
+- **The query names a file under `tests/fonts`, not a URL.** `SimpleScene` joins it onto the fixed
+  `raw.githubusercontent.com` base, so the demo cannot be pointed at another host and `page.route`
+  still intercepts. With no query the scene behaves exactly as before.
+- **Assert which font was requested.** `routeFonts` returns the names the page asked for, and each
+  case checks its own file is among them. Without that a scene that ignored the query would render
+  its default and pass every case — which is why the ASCII case uses `UnitedSansRgBd-48.fnt` rather
+  than the `Lato-Regular-64.fnt` the scene defaults to.
+- **Binary renders untextured.** `Arial.bin` names `font-bin_0.tga`, which is not in the repository
+  and which `TextureLoader` could not read. Omitting `?texture=` leaves the material without a map,
+  so the quads paint solid — enough to show the layout happened, and the binary path's own risk is
+  `fetch` → `ArrayBuffer` → `DataView`/`TextDecoder`, not the atlas. Cross-format agreement of the
+  parsed values stays in `tests/parser.spec.ts`.
+- **A font query pins the longest passage.** `useTextData` otherwise picks at random, and the five
+  passages differ in length by 2x, which moved the binary case between 2.48% and 3.59%. Pinned, the
+  ink readings repeat to two decimals run over run: 19.4% json, 19.3% xml, 6.9% ascii, 3.6% binary
+  against the same 0.90% floor. Binary is the tightest of the nine tests at ~3.9x, next to
+  `/multipage`.
 
 ## Dependencies
 
