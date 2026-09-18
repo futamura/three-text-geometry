@@ -289,6 +289,17 @@ describe('TextLayout', () => {
       expect(layout.height).toStrictEqual(0);
     });
 
+    test('an option without a font keeps the one the layout has', () => {
+      const font = FontOf('am');
+      const layout = new TextLayout('am', { font });
+
+      layout.update('am', { letterSpacing: 4 });
+
+      expect(layout.option.font).toBe(font);
+      expect(layout.option.letterSpacing).toStrictEqual(4);
+      expect(layout.glyphs.length).toStrictEqual(2);
+    });
+
     test('substitutes the tab fallback glyph', () => {
       const str = fs.readFileSync('tests/fonts/Lato-Regular-64.fnt').toString();
       const font = new BMFontAsciiParser().parse(str);

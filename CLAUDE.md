@@ -101,6 +101,22 @@ The `@three-text-geometry/*` → `./src/*` aliases in `compilerOptions.paths` ar
 - CI runs tests with xvfb-run on Ubuntu (libgl1-mesa-dev for headless GL)
 - `tsconfig.json` sets no `lib` or `target`, so newer library methods (`Array.prototype.at`, for one) do not typecheck in tests, and `fs.readFileSync` yields a `Uint8Array<ArrayBufferLike>` that is not assignable to `BlobPart`
 - ESLint's `jsdoc/require-*` rules apply to `tests/` as well, including local helper functions
+- `e2e/` is Playwright's, not Jest's — `testPathIgnorePatterns` keeps `e2e/*.spec.ts` out of `pnpm test`. See [Smoke-testing the demo](#smoke-testing-the-demo)
+
+### The branches that are left, and why they stay
+
+Every file reaches 100% lines. The handful of uncovered *branches* are unreachable from the public
+API, not gaps — reaching them would mean testing a state the code cannot be in. Confirmed by
+reading the call graph, not by assumption:
+
+- `BMFontAsciiParser.ts` `if (lines.length === 0)` — `String.prototype.split` always returns at
+  least one element, so the empty input gives `['']`
+- `TextLayout.ts` getters, `this._x ?? 0` — `update()` assigns all nine fields before anything else
+  and the constructor always calls it, so none of them is ever undefined
+- `TextLayout.ts` `if (!space) return` and `getGlyphById`'s `if (!font.chars || …)` — both sit
+  behind the identical guard in `_setupSpaceGlyphs`, which returns first for a font with no chars
+
+Leave them. Deleting them would touch `src/` and the committed dist to make a number rounder.
 
 ### What jsdom does not provide
 
@@ -122,6 +138,34 @@ The `@three-text-geometry/*` → `./src/*` aliases in `compilerOptions.paths` ar
 ### Checking a change in the demo
 
 `demo/` depends on the library through `file:..`, which pnpm **copies** at install time rather than linking. After rebuilding the dist, run `pnpm install --force` in `demo/` and start Vite with `--force`, or the demo keeps running the previous build.
+
+### Smoke-testing the demo
+
+`e2e/` holds the only test that looks at a rendered pixel. `pnpm e2e-install` once, then
+`pnpm e2e`; it needs the library built and `demo/` reinstalled and built first, for the `file:..`
+reason above. The `demo-smoke` job does exactly that, and it is part of `tests-result`, so it
+blocks a merge through the check branch protection already names.
+
+It opens `/simple`, `/shuffle` and `/multipage` twice each: once with the fonts withheld, which
+leaves only the axes helper on the canvas, and once with them served, polling until the lit share
+of the canvas beats that floor by 2x. The floor is measured per run rather than hardcoded because
+`OrbitControls autoRotate` keeps the camera moving. Four things to know:
+
+- **Hide the overlays before measuring.** An element screenshot captures what is composited *over*
+  the canvas, and `stats.js` and the demo's MUI nav are white. They were 3.44% of the frame against
+  a 4.55% floor — most of what the floor was measuring. `openScene` hides everything but the canvas,
+  which puts the floor at 0.84%.
+- **No WebGPU flag, on purpose.** `--enable-unsafe-webgpu` does give headless Chromium an adapter,
+  but then every route reports `WebGPU Device Lost` and paints an opaque canvas. Without it
+  `THREE.WebGPURenderer` falls back to its WebGL backend and renders with no console errors.
+- **`/shader` and `/shuffleshader` are excluded.** Their material comes from `wgslFn`, so it is raw
+  WGSL that cannot compile on that backend. That needs a working WebGPU adapter, which CI has not.
+- **Fonts come from `tests/fonts` through `page.route`,** not from the `raw.githubusercontent.com`
+  URLs the scenes carry, so the run is offline and tests the checkout. `fulfill`, not `continue` —
+  Playwright refuses to redirect a request to another protocol.
+
+If it ever flakes, lower the multiplier rather than adding a sleep; the poll already waits 30s.
+`/multipage` is the route to watch, since its text covers the least canvas.
 
 ## Dependencies
 
