@@ -1,3 +1,9 @@
+## [5.0.8](https://github.com/futamura/three-text-geometry/compare/5.0.7...5.0.8) (2026-09-18)
+
+### Bug Fixes
+
+* re-derive the end index when the text changes ([#193](https://github.com/futamura/three-text-geometry/issues/193)) ([6852bc6](https://github.com/futamura/three-text-geometry/commit/6852bc60844079f15ab9300fc5d03a1a7cabb004)), closes [#186](https://github.com/futamura/three-text-geometry/issues/186)
+
 ## [5.0.7](https://github.com/futamura/three-text-geometry/compare/5.0.6...5.0.7) (2026-09-18)
 
 ### Bug Fixes
