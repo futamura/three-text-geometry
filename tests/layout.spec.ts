@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { TextLayout } from '@three-text-geometry/layout';
 import { BMFontAsciiParser, BMFontJsonParser } from '@three-text-geometry/parser';
-import { BMFontChar, TextAlign, TextGlyph, TextLayoutOption, WordWrapMode } from '@three-text-geometry/types';
+import { BMFont, BMFontChar, DefaultBMFont, TextAlign, TextGlyph, TextLayoutOption, WordWrapMode } from '@three-text-geometry/types';
 
 function DefaultBMFontChar(): BMFontChar {
   return {
@@ -171,5 +171,120 @@ describe('TextLayout', () => {
       prevOption = curOption;
       prevHeight = curHeight;
     }
+  });
+
+  describe('Accessors', () => {
+    const json = fs.readFileSync('tests/fonts/Lato-Regular-32.json').toString();
+    const font = new BMFontJsonParser().parse(json);
+
+    test('text setter re-runs the layout', () => {
+      const layout = new TextLayout('xx', { font: font });
+      layout.text = 'hh';
+      expect(layout.text).toStrictEqual('hh');
+      expect(layout.glyphs.map((glyph: TextGlyph) => String.fromCharCode(glyph.data.id)).join('')).toStrictEqual('hh');
+    });
+
+    test('text setter keeps the end index of the previous text', () => {
+      /** `end` is resolved once and then carried in the options, so a longer text is clipped. */
+      const layout = new TextLayout('xx', { font: font });
+      layout.text = 'hhhh';
+      expect(layout.text).toStrictEqual('hhhh');
+      expect(layout.option.end).toStrictEqual(2);
+      expect(layout.glyphs.length).toStrictEqual(2);
+    });
+
+    test('option setter replaces the whole option', () => {
+      const layout = new TextLayout('xx', { font: font, letterSpacing: 8, align: TextAlign.Right });
+      layout.option = { font: font, letterSpacing: 4 };
+      expect(layout.option.letterSpacing).toStrictEqual(4);
+      expect(layout.option.align).toStrictEqual(TextAlign.Left);
+      expect(layout.glyphs.length).toStrictEqual(2);
+    });
+
+    test('cap height and line height match the font', () => {
+      const layout = new TextLayout('Hx', { font: font });
+      expect(layout.lineHeight).toStrictEqual(font.common.lineHeight);
+      expect(layout.capHeight).toBeGreaterThan(0);
+    });
+
+    test('toString reports the metrics', () => {
+      const layout = new TextLayout('Hx', { font: font });
+      expect(layout.toString()).toContain('glyphs: 2');
+      expect(layout.toString()).toContain(`lineHeight: ${font.common.lineHeight}`);
+      expect(layout.toString()).toContain(`baseline: ${font.common.base}`);
+    });
+  });
+
+  describe('Fallback glyphs', () => {
+    /**
+     * Builds a minimal font that provides a glyph for each of the given characters.
+     *
+     * @param {string} chars - The characters to provide a glyph for.
+     * @returns {BMFont} The font.
+     */
+    function FontOf(chars: string): BMFont {
+      const font = DefaultBMFont() as BMFont;
+      font.common.lineHeight = 10;
+      font.common.base = 8;
+      font.common.scaleW = 64;
+      font.common.scaleH = 64;
+      font.chars = chars.split('').map((char: string, index: number) => ({
+        ...DefaultBMFontChar(),
+        id: char.charCodeAt(0),
+        index: index,
+        char: char,
+        width: 6,
+        height: 8,
+        xadvance: 7,
+      }));
+      return font;
+    }
+
+    test('falls back to the m glyph when the font has no space', () => {
+      const font = FontOf('am');
+      const layout = new TextLayout('a a', { font: font });
+      expect(layout.glyphs.map((glyph: TextGlyph) => glyph.data.id)).toStrictEqual(['a', 'm', 'a'].map((char: string) => char.charCodeAt(0)));
+    });
+
+    test('falls back to the first glyph when the font has no space, m or w', () => {
+      const font = FontOf('H');
+      const layout = new TextLayout('H H', { font: font });
+      expect(layout.glyphs.map((glyph: TextGlyph) => glyph.data.id)).toStrictEqual(['H', 'H', 'H'].map((char: string) => char.charCodeAt(0)));
+    });
+
+    test('skips a character the font has no glyph for', () => {
+      const font = FontOf('am');
+      const layout = new TextLayout('az', { font: font });
+      expect(layout.glyphs.length).toStrictEqual(1);
+      expect(layout.glyphs[0]!.data.id).toStrictEqual('a'.charCodeAt(0));
+    });
+
+    test('x-height is 0 when the font has no x-height character', () => {
+      const layout = new TextLayout('H', { font: FontOf('H') });
+      expect(layout.xHeight).toStrictEqual(0);
+    });
+
+    test('cap height is 0 when the font has no cap-height character', () => {
+      const layout = new TextLayout('a', { font: FontOf('am') });
+      expect(layout.capHeight).toStrictEqual(0);
+    });
+
+    test('a font without chars lays out nothing', () => {
+      const layout = new TextLayout('abc', { font: DefaultBMFont() as BMFont });
+      expect(layout.glyphs).toStrictEqual([]);
+      expect(layout.width).toStrictEqual(0);
+      expect(layout.height).toStrictEqual(0);
+    });
+
+    test('substitutes the tab fallback glyph', () => {
+      const str = fs.readFileSync('tests/fonts/Lato-Regular-64.fnt').toString();
+      const font = new BMFontAsciiParser().parse(str);
+      const space = font.chars.find((char: BMFontChar) => char.id === ' '.charCodeAt(0))!;
+      const layout = new TextLayout('a\tb', { font: font, tabSize: 3 });
+      const tab = layout.glyphs[1]!.data;
+      expect(layout.glyphs.length).toStrictEqual(3);
+      expect(tab.id).toStrictEqual('\t'.charCodeAt(0));
+      expect(tab.xadvance).toStrictEqual(3 * space.xadvance);
+    });
   });
 });
