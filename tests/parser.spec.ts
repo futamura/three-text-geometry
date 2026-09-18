@@ -14,6 +14,23 @@ function readLocalFile(filePath: string, binary?: boolean): string | Buffer {
   return fs.readFileSync(resolved, 'utf-8');
 }
 
+/**
+ * Finds a block in a BMFont binary, whose blocks are a one-byte id, a four-byte size and a payload.
+ *
+ * @param {Uint8Array} bytes - The font file.
+ * @param {number} id - The block id: 1 info, 2 common, 3 pages, 4 chars, 5 kernings.
+ * @returns {number} The offset the block starts at, or -1 when the file does not carry it.
+ */
+function binaryBlockStart(bytes: Uint8Array, id: number): number {
+  const buf = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let i = 4;
+  while (i < buf.byteLength - 1) {
+    if (buf.getUint8(i) === id) return i;
+    i += 5 + buf.getInt32(i + 1, true);
+  }
+  return -1;
+}
+
 const XML_SPACE = '<char id="32" x="0" y="0" width="1" height="1" xoffset="0" yoffset="0" xadvance="10" page="0" chnl="15"/>';
 const XML_A = '<char id="65" x="2" y="2" width="3" height="4" xoffset="0" yoffset="0" xadvance="12" page="0" chnl="15"/>';
 const XML_KERNING = '<kerning first="32" second="65" amount="-1"/>';
@@ -308,6 +325,41 @@ describe('BMFontParser', () => {
     expect(font.info.padding).toEqual([0, 0, 0, 0]);
   }, 20000);
 
+  test('Ascii / The same face parses to the same font as the JSON parser', () => {
+    // The equivalent XML test caught #202, where the chars kept their attributes as strings.
+    const ascii = new BMFontAsciiParser().parse(readLocalFile('Lato-Regular-32.fnt'));
+    const json = new BMFontJsonParser().parse(readLocalFile('Lato-Regular-32.json'));
+
+    expect(ascii.chars).toEqual(json.chars);
+    expect(ascii.kernings).toEqual(json.kernings);
+    expect(ascii.common).toEqual(json.common);
+    expect(ascii.pages).toEqual(json.pages);
+  });
+
+  test('Ascii / A line without a separator is rejected', () => {
+    expect(() => new BMFontAsciiParser().parse('info')).toThrow(new BMFontError('No page data'));
+  });
+
+  test.each([
+    ['common', 'No common data'],
+    ['page', 'No page data'],
+    ['char ', 'No char data'],
+  ])('Ascii / A font with no %s line is rejected', (prefix, message) => {
+    const data = readLocalFile('Lato-Regular-32.fnt')
+      .split('\n')
+      .filter((line) => !line.startsWith(prefix))
+      .join('\n');
+
+    expect(() => new BMFontAsciiParser().parse(data)).toThrow(new RegExp(`^${message}`));
+  });
+
+  test('Ascii / An unknown root key is ignored', () => {
+    const data = readLocalFile('Lato-Regular-32.fnt');
+    const withExtra = data.replace('info face=', 'future key=1\ninfo face=');
+
+    expect(new BMFontAsciiParser().parse(withExtra)).toEqual(new BMFontAsciiParser().parse(data));
+  });
+
   test('Ascii / Negative numeric lists are parsed as arrays', () => {
     const font = new BMFontAsciiParser().parse(readLocalFile('DejaVu-sdf.fnt'));
     expect(font.info.face).toEqual('DejaVu Sans Mono');
@@ -354,6 +406,30 @@ describe('BMFontParser', () => {
 
   test('Binary / Missing header', () => {
     expect(() => new BMFontBinaryParser().parse(new Uint8Array([0, 0, 0, 3, 0, 0]))).toThrow(new BMFontError('Missing BMF byte header'));
+  });
+
+  test('Binary / A version past 3 is rejected', () => {
+    expect(() => new BMFontBinaryParser().parse(new Uint8Array([66, 77, 70, 4, 0, 0]))).toThrow(new BMFontError('Only supports bitmap font binary v3'));
+  });
+
+  test('Binary / A font with no kerning pairs writes no kernings block', () => {
+    // The block loop reads five blocks, so a file that stops after four has to leave the rest alone.
+    const data = new Uint8Array(readLocalFile('Arial.bin', true));
+    const font = new BMFontBinaryParser().parse(data.slice(0, binaryBlockStart(data, 5)));
+
+    expect(font.kernings).toEqual([]);
+    expect(font.chars).toHaveLength(191);
+    expect(font.info.face).toEqual('Arial');
+  });
+
+  test('Binary / fixedHeight comes from the info bit field', () => {
+    // fixedHeight is only carried by the binary format, and no fixture sets it.
+    const data = new Uint8Array(readLocalFile('Arial.bin', true));
+    const fixed = data.slice();
+    fixed[binaryBlockStart(data, 1) + 5 + 2]! |= 1 << 3;
+
+    expect(new BMFontBinaryParser().parse(data).info.fixedHeight).toEqual(0);
+    expect(new BMFontBinaryParser().parse(fixed).info.fixedHeight).toEqual(1);
   });
 
   test('Binary / charset is not read', () => {

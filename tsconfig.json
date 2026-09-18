@@ -25,6 +25,6 @@
       "@three-text-geometry-tests/*": ["./tests/*"]
     }
   },
-  "include": ["src", "tests", "scripts"],                      // Specify directories to include for TypeScript compilation <https://www.typescriptlang.org/tsconfig#include>
+  "include": ["src", "tests", "scripts", "e2e"],                      // Specify directories to include for TypeScript compilation <https://www.typescriptlang.org/tsconfig#include>
   "exclude": ["dist-*", "demo"]                                // Prevent unwanted things like auto-import from built modules <https://www.typescriptlang.org/tsconfig#exclude>
 }

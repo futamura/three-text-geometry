@@ -20,6 +20,8 @@ const config: Config.InitialOptions = {
     'jest-watch-suspend',
   ],
   modulePathIgnorePatterns: ['<rootDir>/demo/'],
+  // e2e/*.spec.ts is Playwright's, and it matches jest's default testMatch.
+  testPathIgnorePatterns: ['<rootDir>/e2e/', '<rootDir>/node_modules/'],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
     // three is ESM-only since r186 (build/three.cjs only does require(esm)), so its build files are transpiled to CommonJS.

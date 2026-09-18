@@ -119,3 +119,7 @@ demo/yarn.lock
 
 # VSCode
 .vscode
+
+# Playwright
+test-results
+playwright-report
