@@ -173,8 +173,9 @@ class TextGeometry extends THREE.BufferGeometry {
    *
    * The option is partial: a field the caller omits keeps the value the geometry already has,
    * unlike the constructor and the `option` setter, which fill an omitted field with its default.
-   * `end` is the exception, because it is derived from the text: a call that changes the text
-   * re-derives it, whether or not it passes an option.
+   * The fields derived from another are the exception. `end` comes from the text, so a call that
+   * changes the text re-derives it, whether or not it passes an option; `lineHeight` comes from the
+   * font, so a call that changes the font re-derives it unless it passes a `lineHeight` of its own.
    *
    * @param {string} text - The text to layout.
    * @param {TextGeometryOption} option - The options for the text geometry.
@@ -183,14 +184,18 @@ class TextGeometry extends THREE.BufferGeometry {
   public update(text?: string, option?: TextGeometryOption) {
     if (text !== undefined) this._text = text;
     if (option !== undefined) {
+      const previousFont = this._opt.font;
       if (option.font !== undefined) this._opt.font = option.font;
+      /** `lineHeight` defaults to the font's, so a new font brings its own unless one is given. */
+      const fontChanged = this._opt.font !== previousFont;
       this._opt.start = option.start !== undefined ? Math.max(0, option.start) : 0;
       this._opt.end = option.end !== undefined ? option.end : this._text.length;
       this._opt.width = option.width !== undefined ? option.width : undefined;
       this._opt.align = option.align !== undefined ? option.align : this._opt.align;
       this._opt.mode = option.mode !== undefined ? option.mode : this._opt.mode;
       this._opt.letterSpacing = option.letterSpacing !== undefined ? option.letterSpacing : this._opt.letterSpacing;
-      this._opt.lineHeight = option.lineHeight !== undefined ? option.lineHeight : this._opt.lineHeight;
+      if (option.lineHeight !== undefined) this._opt.lineHeight = option.lineHeight;
+      else if (fontChanged) this._opt.lineHeight = this._opt.font!.common.lineHeight;
       this._opt.tabSize = option.tabSize !== undefined ? option.tabSize : this._opt.tabSize;
       this._opt.flipY = option.flipY !== undefined ? option.flipY : this._opt.flipY;
       this._opt.multipage = option.multipage !== undefined ? option.multipage : this._opt.multipage;
