@@ -254,17 +254,24 @@ Only `beta` exists as a branch; `alpha` and `rc` never have. semantic-release sk
 branch that has no ref, which is why their absence has never broken a release.
 
 **Do not delete `beta` as branch cleanup.** It reads as a leftover — its tip is `566b0fd`
-(2025-06-23), it holds zero commits `main` lacks, and it sits 177 commits behind — but it is the
-entry point for the `beta` channel, and the only registered channel that still has one. Removing it
-is a release-configuration decision, not housekeeping: drop the `.releaserc.mjs` entry in the same
-change, or leave both in place.
+(2025-06-23), it holds zero commits `main` lacks, and it falls further behind with every release —
+but it is the entry point for the `beta` channel, and the only registered channel that still has
+one. Removing it is a release-configuration decision, not housekeeping: drop the `.releaserc.mjs`
+entry in the same change, or leave both in place.
 
 To cut a pre-release, branch `beta` off `main`, push the commits there, and semantic-release
 publishes `x.y.z-beta.n` under the npm `beta` dist-tag.
 
-That dist-tag is currently stale: it points at `0.0.1-beta.5` (tags `0.0.1-beta.1` through `.5`), so
-`npm install three-text-geometry@beta` resolves to a 0.0.1 pre-release rather than anything near
-`latest` (4.1.1). The next `beta` release moves it.
+The channel itself has been unused since the initial development: the only pre-releases ever
+published are `0.0.1-beta.1` through `.5`, from 2021-12-09 to 2022-02-04. The `beta` dist-tag still
+pointed at `0.0.1-beta.5` until 2026-09-19, which meant `npm install three-text-geometry@beta`
+handed out that 0.0.1 pre-release; it was repointed by hand to the then-current `latest`, 5.0.10.
+The next `beta` release overwrites it.
+
+Moving a dist-tag by hand needs a **real terminal**, not a tool-run shell. 2FA on the npm account is
+WebAuthn, so there is no `--otp=<6 digits>` to pass, and the web-OTP fallback blocks on
+`Press ENTER to open in the browser...`; a non-interactive shell cannot answer that and the command
+dies with `EOTP`. `npm login` is the exception — it polls without the prompt.
 
 ### Branch Protection
 
