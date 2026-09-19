@@ -5,7 +5,7 @@ const config = {
     "typedoc-plugin-merge-modules"
   ],
   out: "docs",
-  entryPoints: ["./src/index.ts"],
+  entryPoints: ["./src/index.ts", "./src/tsl.ts"],
   customCss: "typedoc.css",
   entryPointStrategy: "expand",
   mergeModulesMergeMode: "module",
