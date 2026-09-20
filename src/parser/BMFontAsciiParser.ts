@@ -1,5 +1,5 @@
-import { BMFontError } from '../error';
-import { BMFont, BMFontChar, BMFontCommon, BMFontDistanceField, BMFontInfo, BMFontKern, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontInfo, IBMFontParser } from '../types';
+import { BMFontError } from '../error/index.js';
+import { BMFont, BMFontChar, BMFontCommon, BMFontDistanceField, BMFontInfo, BMFontKern, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontInfo, IBMFontParser } from '../types/index.js';
 
 /**
  * The class for parsing font data in ASCII format.

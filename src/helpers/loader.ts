@@ -1,7 +1,7 @@
 import { Texture, TextureLoader } from 'three';
 
-import { BMFontAsciiParser, BMFontBinaryParser, BMFontJsonParser, BMFontXMLParser } from '../parser';
-import { BMFont } from '../types';
+import { BMFontAsciiParser, BMFontBinaryParser, BMFontJsonParser, BMFontXMLParser } from '../parser/index.js';
+import { BMFont } from '../types/index.js';
 
 /**
  * Receives the bytes read so far and the expected total, which is 0 when the response does not declare its length.

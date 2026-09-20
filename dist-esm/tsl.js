@@ -1,1 +1,1 @@
-export{BasicTextNodeMaterial,MSDFTextNodeMaterial,MultiPageTextNodeMaterial,SDFTextNodeMaterial}from"./materials";
+export{BasicTextNodeMaterial,MSDFTextNodeMaterial,MultiPageTextNodeMaterial,SDFTextNodeMaterial}from"./materials/index.js";

@@ -1,7 +1,7 @@
 import { color, float, texture, uv } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { TextMaterialOption } from './types';
+import { TextMaterialOption } from './types.js';
 
 /**
  * A node-based material for basic bitmap text rendering.

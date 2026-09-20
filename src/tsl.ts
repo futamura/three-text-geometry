@@ -6,5 +6,5 @@
  *
  * @module three-text-geometry/tsl
  */
-export { BasicTextNodeMaterial, MSDFTextNodeMaterial, MultiPageTextNodeMaterial, SDFTextNodeMaterial } from './materials';
-export type { MSDFTextMaterialOption, MultiPageTextMaterialOption, TextMaterialOption } from './materials';
+export { BasicTextNodeMaterial, MSDFTextNodeMaterial, MultiPageTextNodeMaterial, SDFTextNodeMaterial } from './materials/index.js';
+export type { MSDFTextMaterialOption, MultiPageTextMaterialOption, TextMaterialOption } from './materials/index.js';

@@ -1,1 +1,1 @@
-export*from"./compute";export*from"./vertices";export*from"./binary";export*from"./quad-indices";
+export*from"./compute.js";export*from"./vertices.js";export*from"./binary.js";export*from"./quad-indices.js";

@@ -1,7 +1,7 @@
 import { clamp, color, float, Fn, fwidth, max, min, texture, uv } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { MSDFTextMaterialOption } from './types';
+import { MSDFTextMaterialOption } from './types.js';
 
 /**
  * Computes the median of three values.

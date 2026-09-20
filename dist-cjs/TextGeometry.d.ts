@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TextGeometryOption, TextGlyph } from './types';
+import { TextGeometryOption, TextGlyph } from './types/index.js';
 declare class TextGeometry extends THREE.BufferGeometry {
     private _opt;
     private _text;

@@ -1,4 +1,4 @@
-import { BMFont, TextAlign, WordWrapMode } from '../types';
+import { BMFont, TextAlign, WordWrapMode } from '../types/index.js';
 
 /**
  * The interface to define options for `TextGeometry`.
