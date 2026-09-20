@@ -1,3 +1,9 @@
+## [5.0.11](https://github.com/futamura/three-text-geometry/compare/5.0.10...5.0.11) (2026-09-20)
+
+### Bug Fixes
+
+* make the ESM build loadable by Node ([#228](https://github.com/futamura/three-text-geometry/issues/228)) ([9c3de65](https://github.com/futamura/three-text-geometry/commit/9c3de658ad2db56d4381b8df12b0f4ebc6e12aa3))
+
 ## [5.0.10](https://github.com/futamura/three-text-geometry/compare/5.0.9...5.0.10) (2026-09-18)
 
 ### Bug Fixes
