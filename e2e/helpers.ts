@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { expect, Page } from '@playwright/test';
 
 /**
@@ -10,8 +11,13 @@ import { expect, Page } from '@playwright/test';
  */
 export const RAW = 'https://raw.githubusercontent.com/futamura/three-text-geometry/develop/tests/fonts/';
 
-/** The directory the intercepted requests are served from. */
-export const FONTS = path.resolve(__dirname, '../tests/fonts');
+/**
+ * The directory the intercepted requests are served from.
+ *
+ * `__dirname` is not defined here: the package is `"type": "module"` since 6.0.0, so Playwright
+ * loads these files as ESM.
+ */
+export const FONTS = fileURLToPath(new URL('../tests/fonts', import.meta.url));
 
 /**
  * How long a wait may take before it is treated as a failure rather than a slow machine. Every wait

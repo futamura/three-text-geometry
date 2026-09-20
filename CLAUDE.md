@@ -31,6 +31,8 @@ Run a single test file: `pnpm jest tests/parser.spec.ts`
 
 **Font parsers** (`src/parser/`): Four parsers implementing `IBMFontParser<T>` — `BMFontJsonParser` (with AJV schema validation), `BMFontXMLParser`, `BMFontAsciiParser`, `BMFontBinaryParser`. All parse into the common `BMFont` type defined in `src/types/BMFont.ts`.
 
+`info.charset` is `string[]` from every parser since 6.0.0; it was `string | string[]` and the caller had to branch. `src/parser/charset.ts` holds the one normalizer: an array is kept (a JSON font's list of generated characters), a string is read as the comma-separated charset names the BMFont spec describes (`"ANSI"` → `['ANSI']`, `""` → `[]`), and a binary font stays `[]` because the charset byte is not read. It is internal — not exported from either entry point. The JSON *schema* still accepts both shapes, because it validates the input, not the parsed result.
+
 **Materials** (`src/materials/`): TSL node materials — `BasicTextNodeMaterial`, `SDFTextNodeMaterial`, `MSDFTextNodeMaterial`, `MultiPageTextNodeMaterial`. Exported only from the `three-text-geometry/tsl` subpath (`src/tsl.ts`); see [Entry points and `sideEffects`](#entry-points-and-sideeffects). The GLSL shaders were removed in 4.0.0.
 
 **React integration:** `src/helpers/fiber.ts` extends R3F for `<textGeometry>` JSX usage. `src/helpers/hook.ts` provides React hooks.
@@ -71,17 +73,17 @@ else calls `update()` with a full option any more.
 
 ## Build Output
 
-Dual format: CommonJS (`dist-cjs/`, ES2018) and ESM (`dist-esm/`, ES2020). Both configured via separate tsconfig files (`tsconfig.cjs.json`, `tsconfig.esm.json`), and both compile with plain `tsc` — there are no transformer plugins.
+ESM only (`dist-esm/`, ES2020), built by plain `tsc` from `tsconfig.esm.json` — there are no transformer plugins. The package is `"type": "module"` and the CommonJS build was dropped in 6.0.0 (#229): three.js has been ESM-only since r186, and `require('three-text-geometry')` keeps working on Node 22.12+ through `require(esm)`. Nothing here may introduce a top-level await, which is what would break that path.
 
 ### dist is committed, and it is what npm publishes
 
-The release job runs `pnpm semantic-release` without building, so the tarball contains `dist-cjs/` and `dist-esm/` exactly as committed. Any `src/` change that should ship must include the rebuilt dist in the same PR (`pnpm build`; the output is deterministic, so unrelated files do not churn).
+The release job runs `pnpm semantic-release` without building, so the tarball contains `dist-esm/` exactly as committed. Any `src/` change that should ship must include the rebuilt dist in the same PR (`pnpm build`; the output is deterministic, so unrelated files do not churn).
 
 ### Entry points and `sideEffects`
 
 - `.` (`src/index.ts`) must not reach `src/materials/`. The TSL node materials import `three/webgpu` and `three/tsl`, and re-exporting them from the root put the WebGPU renderer (~87 KB gzip) in every consumer's bundle in 4.x. They live on the `./tsl` subpath (`src/tsl.ts`) since 5.0.0.
-- `sideEffects` lists `dist-*/index.js` as well as `dist-*/helpers/fiber.js`. `import 'three-text-geometry'` exists to run `extend({ TextGeometry })`; if the index is marked side-effect free, a bundler drops that bare import before it ever reaches fiber.
-- `pnpm verify-tree-shaking` bundles both cases from the committed dist with esbuild and runs in the `tests` job of both workflows. `node scripts/verify-tree-shaking.mjs <unpacked-tarball>` checks a published version; against 4.2.0 it fails, which is how to confirm the check still detects a leak.
+- `sideEffects` lists `dist-esm/index.js` as well as `dist-esm/helpers/fiber.js`. `import 'three-text-geometry'` exists to run `extend({ TextGeometry })`; if the index is marked side-effect free, a bundler drops that bare import before it ever reaches fiber.
+- `pnpm verify-tree-shaking` bundles both cases from the committed dist with esbuild, asserts that `dist-esm/index.js` never names the materials at all, and runs in the `tests` job of both workflows. `node scripts/verify-tree-shaking.mjs <unpacked-tarball>` checks a published version; against 4.2.0 it fails, which is how to confirm the check still detects a leak.
 - The same script also checks that every package the dist imports is in `dependencies` or `peerDependencies`. The bundling scenarios cannot catch that, because they externalize every other package — an undeclared import resolves against the repo's own `node_modules` and only breaks in a consumer's install, which is how `axios` shipped in 4.x. Against the 4.2.0 tarball it names both `axios` and the `tslib` that `importHelpers` used to inline.
 
 ### Node has to be able to load dist-esm, and only Node can check that
@@ -89,30 +91,34 @@ The release job runs `pnpm semantic-release` without building, so the tarball co
 Node's ESM resolver takes a specifier literally: no extension is appended and no directory index is
 read. `tsc` never rewrites a specifier either, so whatever `src/` writes is what ships. Through
 5.0.10 `src/` imported `./TextGeometry` and `../types`, and `import 'three-text-geometry'` therefore
-died with `ERR_MODULE_NOT_FOUND` — dist-cjs was the only entry Node could load (#228).
+died with `ERR_MODULE_NOT_FOUND` — dist-cjs was the only entry Node could load (#228, fixed in
+5.0.11, which is what let 6.0.0 drop the CommonJS build).
 
 - **Every relative import in `src/` carries an explicit extension**: `./TextGeometry.js` for a file,
   `../types/index.js` for a barrel. The specifier names the *built* file, which is why it is `.js`
   from a `.ts` source. Jest resolves those back to `.ts` through `ts-jest-resolver`, already in
   `jest.config.ts`.
 - **The JSON schema lives in `src/parser/BMFontJsonSchema.ts`, not in a `.json` file.** Node's ESM
-  resolver needs `with { type: 'json' }` on a JSON import, and `tsc` refuses to emit that attribute
-  under `module: CommonJS` — one source cannot satisfy both builds. A `.ts` module does.
-- **`moduleResolution` stays `bundler` in `tsconfig.esm.json`.** `nodenext` would reject a missing
-  extension at compile time, but TypeScript only accepts it with `module: nodenext`, and that mode
-  picks the format from the nearest `package.json` `type`. The root manifest has none, so the ESM
-  build would emit CommonJS. It becomes available once the package is `"type": "module"` (#229).
-- **`dist-esm/package.json` is `{ "type": "module" }`, written by `scripts/write-esm-package-type.mjs`
-  at the end of `build-esm`** (`clean-dist` removes the directory, so it cannot just be committed).
-  Without it every file under dist-esm is nominally CommonJS, and Node reparses each one and warns
-  `MODULE_TYPELESS_PACKAGE_JSON`. Marking the subtree leaves dist-cjs and the package's own `type`
-  alone; setting `type` in the root manifest would flip dist-cjs to ESM, which is breaking.
-- **`pnpm verify-node-resolution` is what catches a regression.** It checks that every relative
-  specifier in the committed dist-esm has an extension, then `import`s and `require`s both entry
-  points in real Node processes through the package's `exports`. Jest compiles `src/` and
-  `verify-tree-shaking` bundles with esbuild, so neither resolver is Node's and neither saw this.
-  It runs in the `tests` job of both workflows; `git checkout <pre-fix commit> -- dist-esm` and a run
-  is how to confirm it still detects the defect.
+  resolver needs `with { type: 'json' }` on a JSON import, and `tsc` refused to emit that attribute
+  under the CommonJS build that 5.x still had. The `.ts` module outlived the reason and stays: it
+  needs no import attribute and no `resolveJsonModule`.
+- **`tsconfig.esm.json` is `module: NodeNext` / `moduleResolution: nodenext` since 6.0.0**, which
+  rejects an extensionless relative import at compile time. That mode reads the format from the
+  nearest `package.json` `type`, so it only became usable once the package was `"type": "module"` —
+  before that it emitted CommonJS into dist-esm, measured, which is why 5.0.11 shipped with
+  `bundler` and a runtime check instead.
+- **`import { Ajv } from 'ajv'`, not a default import.** ajv 8 is CommonJS with ESM-shaped types;
+  under `nodenext` a default import resolves to the module namespace and `new Ajv()` fails to
+  typecheck. The named import matches `exports.Ajv` in ajv's own output, so it works at runtime too.
+- **`tsconfig.json` — the config Jest and the editor use — still resolves as node10**, which does not
+  read `exports`. That is why `src/types/three-webgpu.d.ts` declares `three/webgpu` and `three/tsl`.
+- **`pnpm verify-node-resolution` is what catches a regression in the published files.** The dist is
+  committed rather than built at release, so a compile-time guarantee is not enough. It checks that
+  every relative specifier in the committed dist-esm has an extension, then `import`s and `require`s
+  both entry points in real Node processes through the package's `exports` — the `require` probe is
+  the `require(esm)` path that CJS callers depend on now that there is no CommonJS build. It runs in
+  the `tests` job of both workflows; `git checkout <pre-5.0.11 commit> -- dist-esm` and a run is how
+  to confirm it still detects the defect.
 
 The `@three-text-geometry/*` → `./src/*` aliases in `compilerOptions.paths` are used by `tests/` only; `src/` imports relatively, so the build has nothing to rewrite. Jest resolves the aliases through `pathsToModuleNameMapper` in `jest.config.ts`, which reads that same `paths` block — keep it even though the build does not need it.
 
@@ -193,6 +199,10 @@ autoRotate` keeps the camera moving. Three things to know:
   --use-angle=swiftshader` makes it work. With no flags at all `WebGPURenderer` falls back to WebGL,
   which renders the ordinary scenes but not `/shader` and `/shuffleshader` — their material comes
   from `wgslFn`, and raw WGSL cannot compile there.
+- **`e2e/` runs as ESM.** The package is `"type": "module"` since 6.0.0, so Playwright loads these
+  files as modules and `__dirname` is not defined — `helpers.ts` resolves `FONTS` from
+  `import.meta.url` instead. A `__dirname` added back here fails only in `demo-smoke`, not in `pnpm
+  test`, since Jest still compiles `tests/` to CommonJS.
 - **Fonts come from `tests/fonts` through `page.route`,** not from the `raw.githubusercontent.com`
   URLs the scenes carry, so the run is offline and tests the checkout. `fulfill`, not `continue` —
   Playwright refuses to redirect a request to another protocol.

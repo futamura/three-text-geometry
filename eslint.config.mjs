@@ -103,7 +103,6 @@ export default tseslint.config(
       ".vscode",
       ".github",
       "node_modules",
-      "dist-cjs",
       "dist-esm",
       "tests",
       "jest.config.ts",

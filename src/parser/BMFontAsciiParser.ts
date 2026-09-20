@@ -1,5 +1,6 @@
 import { BMFontError } from '../error/index.js';
 import { BMFont, BMFontChar, BMFontCommon, BMFontDistanceField, BMFontInfo, BMFontKern, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontInfo, IBMFontParser } from '../types/index.js';
+import { normalizeCharset } from './charset.js';
 
 /**
  * The class for parsing font data in ASCII format.
@@ -71,7 +72,7 @@ class BMFontAsciiParser implements IBMFontParser<string> {
       }
       switch (rootKey) {
         case 'info':
-          result.info = keyValues as BMFontInfo;
+          result.info = { ...(keyValues as BMFontInfo), charset: normalizeCharset(keyValues.charset) };
           break;
         case 'common':
           result.common = keyValues as BMFontCommon;

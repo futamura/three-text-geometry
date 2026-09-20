@@ -176,11 +176,19 @@ describe('BMFontParser', () => {
     expect(isBMFont(font)).toEqual(true);
   });
 
-  test('Json / charset is passed through as a string or an array', () => {
+  test('Json / charset is normalized to an array', () => {
     const charset = new BMFontJsonParser().parse(readLocalFile('Roboto-Regular.json')).info.charset;
+    /** A list of generated characters is kept as it is. */
     expect(charset).toHaveLength(95);
     expect(charset.slice(0, 3)).toEqual([' ', '!', '"']);
-    expect(new BMFontJsonParser().parse(readLocalFile('Lato-Regular-32.json')).info.charset).toEqual('');
+    /** An empty name gives an empty array, not ''. */
+    expect(new BMFontJsonParser().parse(readLocalFile('Lato-Regular-32.json')).info.charset).toEqual([]);
+  });
+
+  test('Json / a charset name is read as a comma-separated list', () => {
+    const data = JSON.parse(readLocalFile('Lato-Regular-32.json'));
+    data.info.charset = 'ANSI,OEM';
+    expect(new BMFontJsonParser().parse(data).info.charset).toEqual(['ANSI', 'OEM']);
   });
 
   test('Json / Empty', () => {
@@ -392,10 +400,10 @@ describe('BMFontParser', () => {
     expect(font.info.spacing).toEqual([-8, -8]);
   });
 
-  test('Ascii / charset is kept as a string', () => {
+  test('Ascii / charset is split into an array', () => {
     const data = readLocalFile('Lato-Regular-32.fnt');
-    expect(new BMFontAsciiParser().parse(data).info.charset).toEqual('');
-    expect(new BMFontAsciiParser().parse(data.replace('charset=""', 'charset="ANSI"')).info.charset).toEqual('ANSI');
+    expect(new BMFontAsciiParser().parse(data).info.charset).toEqual([]);
+    expect(new BMFontAsciiParser().parse(data.replace('charset=""', 'charset="ANSI"')).info.charset).toEqual(['ANSI']);
   });
 
   test('Binary / Valid', () => {

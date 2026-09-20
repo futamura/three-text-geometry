@@ -1,8 +1,9 @@
-import Ajv, { ValidateFunction } from 'ajv';
+import { Ajv, ValidateFunction } from 'ajv';
 
 import { BMFontError } from '../error/index.js';
 import { BMFont, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontDistanceField, DefaultBMFontInfo, IBMFontParser } from '../types/index.js';
 import schema from './BMFontJsonSchema.js';
+import { normalizeCharset } from './charset.js';
 
 /**
  * # About the json schema
@@ -55,7 +56,7 @@ class BMFontJsonParser implements IBMFontParser<object | string> {
     return {
       ...DefaultBMFont(),
       ...data,
-      info: { ...DefaultBMFontInfo(), ...data.info },
+      info: { ...DefaultBMFontInfo(), ...data.info, charset: normalizeCharset(data.info?.charset) },
       common: { ...DefaultBMFontCommon(), ...data.common },
       distanceField: { ...DefaultBMFontDistanceField(), ...data.distanceField },
     };

@@ -4,8 +4,8 @@
     "rootDir": "./src",                                        // Explicit root directory for source files <https://www.typescriptlang.org/tsconfig#rootDir>
     "outDir": "dist-esm",                                      // Output directory for compiled files <https://www.typescriptlang.org/tsconfig#outDir>
     "target": "ES2020",                                        // Specify the target ECMAScript version for the output code <https://www.typescriptlang.org/tsconfig#target>
-    "module": "ESNext",                                        // Set the module system to the latest ECMAScript module <https://www.typescriptlang.org/tsconfig#module>
-    "moduleResolution": "bundler",                             // Specify the module resolution strategy to bundler <https://www.typescriptlang.org/tsconfig#moduleResolution>
+    "module": "NodeNext",                                      // Emit the format the package.json "type" implies - ESM, since the package is "type": "module" <https://www.typescriptlang.org/tsconfig#module>
+    "moduleResolution": "nodenext",                            // Resolve the way Node does, so a relative import without a file extension is a compile error <https://www.typescriptlang.org/tsconfig#moduleResolution>
     "lib": ["ESNext", "DOM", "DOM.Iterable"],                  // Include library files for the latest ECMAScript features and DOM <https://www.typescriptlang.org/tsconfig#lib>
     "types": ["node"],                                         // Include Node.js type definitions <https://www.typescriptlang.org/tsconfig#types>
     "skipLibCheck": true,                                      // Skip type checking of declaration files (@webgpu/types conflicts with TS6 built-in WebGPU types)

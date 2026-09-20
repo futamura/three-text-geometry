@@ -1,0 +1,1 @@
+function normalizeCharset(r){return Array.isArray(r)?r.map(r=>""+r):"string"==typeof r?r.split(",").filter(r=>""!==r):[]}export{normalizeCharset};
