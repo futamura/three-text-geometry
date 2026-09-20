@@ -1,4 +1,4 @@
-import { BMFont, BMFontChar, WordWrapOption } from '../types';
+import { BMFont, BMFontChar, WordWrapOption } from '../types/index.js';
 
 /**
  * The interface to define text glyph.

@@ -1,4 +1,4 @@
-import { TextGlyph, TextLayoutOption } from '../types';
+import { TextGlyph, TextLayoutOption } from '../types/index.js';
 declare class TextLayout {
     static readonly X_HEIGHTS: string[];
     static readonly M_WIDTHS: string[];

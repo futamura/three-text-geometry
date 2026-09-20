@@ -1,4 +1,4 @@
-import { BMFont, IBMFontParser } from '../types';
+import { BMFont, IBMFontParser } from '../types/index.js';
 declare class BMFontJsonParser implements IBMFontParser<object | string> {
     parse(json: object | string): BMFont;
 }

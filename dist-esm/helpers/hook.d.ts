@@ -1,5 +1,5 @@
 import { Texture } from 'three';
-import { BMFont } from '../types';
+import { BMFont } from '../types/index.js';
 interface FontProgressCallback {
     (loaded: number, total: number, percent: number): void;
 }

@@ -84,6 +84,36 @@ The release job runs `pnpm semantic-release` without building, so the tarball co
 - `pnpm verify-tree-shaking` bundles both cases from the committed dist with esbuild and runs in the `tests` job of both workflows. `node scripts/verify-tree-shaking.mjs <unpacked-tarball>` checks a published version; against 4.2.0 it fails, which is how to confirm the check still detects a leak.
 - The same script also checks that every package the dist imports is in `dependencies` or `peerDependencies`. The bundling scenarios cannot catch that, because they externalize every other package — an undeclared import resolves against the repo's own `node_modules` and only breaks in a consumer's install, which is how `axios` shipped in 4.x. Against the 4.2.0 tarball it names both `axios` and the `tslib` that `importHelpers` used to inline.
 
+### Node has to be able to load dist-esm, and only Node can check that
+
+Node's ESM resolver takes a specifier literally: no extension is appended and no directory index is
+read. `tsc` never rewrites a specifier either, so whatever `src/` writes is what ships. Through
+5.0.10 `src/` imported `./TextGeometry` and `../types`, and `import 'three-text-geometry'` therefore
+died with `ERR_MODULE_NOT_FOUND` — dist-cjs was the only entry Node could load (#228).
+
+- **Every relative import in `src/` carries an explicit extension**: `./TextGeometry.js` for a file,
+  `../types/index.js` for a barrel. The specifier names the *built* file, which is why it is `.js`
+  from a `.ts` source. Jest resolves those back to `.ts` through `ts-jest-resolver`, already in
+  `jest.config.ts`.
+- **The JSON schema lives in `src/parser/BMFontJsonSchema.ts`, not in a `.json` file.** Node's ESM
+  resolver needs `with { type: 'json' }` on a JSON import, and `tsc` refuses to emit that attribute
+  under `module: CommonJS` — one source cannot satisfy both builds. A `.ts` module does.
+- **`moduleResolution` stays `bundler` in `tsconfig.esm.json`.** `nodenext` would reject a missing
+  extension at compile time, but TypeScript only accepts it with `module: nodenext`, and that mode
+  picks the format from the nearest `package.json` `type`. The root manifest has none, so the ESM
+  build would emit CommonJS. It becomes available once the package is `"type": "module"` (#229).
+- **`dist-esm/package.json` is `{ "type": "module" }`, written by `scripts/write-esm-package-type.mjs`
+  at the end of `build-esm`** (`clean-dist` removes the directory, so it cannot just be committed).
+  Without it every file under dist-esm is nominally CommonJS, and Node reparses each one and warns
+  `MODULE_TYPELESS_PACKAGE_JSON`. Marking the subtree leaves dist-cjs and the package's own `type`
+  alone; setting `type` in the root manifest would flip dist-cjs to ESM, which is breaking.
+- **`pnpm verify-node-resolution` is what catches a regression.** It checks that every relative
+  specifier in the committed dist-esm has an extension, then `import`s and `require`s both entry
+  points in real Node processes through the package's `exports`. Jest compiles `src/` and
+  `verify-tree-shaking` bundles with esbuild, so neither resolver is Node's and neither saw this.
+  It runs in the `tests` job of both workflows; `git checkout <pre-fix commit> -- dist-esm` and a run
+  is how to confirm it still detects the defect.
+
 The `@three-text-geometry/*` → `./src/*` aliases in `compilerOptions.paths` are used by `tests/` only; `src/` imports relatively, so the build has nothing to rewrite. Jest resolves the aliases through `pathsToModuleNameMapper` in `jest.config.ts`, which reads that same `paths` block — keep it even though the build does not need it.
 
 ## Code Style

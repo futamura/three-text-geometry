@@ -1,8 +1,8 @@
 import Ajv, { ValidateFunction } from 'ajv';
 
-import { BMFontError } from '../error';
-import { BMFont, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontDistanceField, DefaultBMFontInfo, IBMFontParser } from '../types';
-import schema from './BMFontJsonSchema.json';
+import { BMFontError } from '../error/index.js';
+import { BMFont, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontDistanceField, DefaultBMFontInfo, IBMFontParser } from '../types/index.js';
+import schema from './BMFontJsonSchema.js';
 
 /**
  * # About the json schema
@@ -10,7 +10,8 @@ import schema from './BMFontJsonSchema.json';
  * $ npm install -g quicktype
  * $ quicktype ./src/types/BMFont.ts -o ./src/parser/BMFontJsonSchema.json --lang schema
  *
- * It has since been edited by hand, so do not regenerate it. The root `$ref` makes the validator check the
+ * It has since been edited by hand, so do not regenerate it. It also no longer lives in a `.json` file —
+ * see the comment on `BMFontJsonSchema.ts` for why. The root `$ref` makes the validator check the
  * font at all, and `required` only lists the fields the layout and geometry read. Generators omit the rest
  * (msdf-bmfont-xml writes no `info.fixedHeight`/`outline`; JSON converted from `.fnt` has no `distanceField`
  * or `chars[].index`/`char`), and `parse` fills them with defaults.

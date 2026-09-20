@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import { TextLayout } from './layout';
-import { TextAlign, TextGeometryOption, TextGlyph } from './types';
-import { computeBox, computeSphere, createIndices, extractPages, extractPositions, extractUVs } from './utils';
+import { TextLayout } from './layout/index.js';
+import { TextAlign, TextGeometryOption, TextGlyph } from './types/index.js';
+import { computeBox, computeSphere, createIndices, extractPages, extractPositions, extractUVs } from './utils/index.js';
 
 /**
  * The class that generates THREE.BufferGeometry from BMFont data.

@@ -4,8 +4,8 @@
  *
  */
 
-import { BMFontError } from '../error';
-import { BMFont, BMFontChar, BMFontCommon, BMFontInfo, BMFontKern, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontInfo, DefaultBMFontKern, IBMFontParser } from '../types';
+import { BMFontError } from '../error/index.js';
+import { BMFont, BMFontChar, BMFontCommon, BMFontInfo, BMFontKern, DefaultBMFont, DefaultBMFontCommon, DefaultBMFontInfo, DefaultBMFontKern, IBMFontParser } from '../types/index.js';
 
 /**
  * The class for parsing font data in Binary format.

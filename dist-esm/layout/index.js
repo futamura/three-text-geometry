@@ -1,1 +1,1 @@
-export*from"./TextLayout";export*from"./WordWrap";
+export*from"./TextLayout.js";export*from"./WordWrap.js";

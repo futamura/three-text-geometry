@@ -57,6 +57,9 @@ jobs:
       - name: Verify tree shaking
         run: pnpm verify-tree-shaking
 
+      - name: Verify Node resolution
+        run: pnpm verify-node-resolution
+
       - name: Test
         run: xvfb-run --auto-servernum pnpm test-coverage
 

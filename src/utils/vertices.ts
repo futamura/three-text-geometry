@@ -1,4 +1,4 @@
-import { TextGlyph } from '../types';
+import { TextGlyph } from '../types/index.js';
 
 /**
  * The function for extracting the pages of the glyphs.

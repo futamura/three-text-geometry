@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu';
-import { MSDFTextMaterialOption } from './types';
+import { MSDFTextMaterialOption } from './types.js';
 declare class MSDFTextNodeMaterial extends THREE.MeshBasicNodeMaterial {
     constructor(option?: MSDFTextMaterialOption);
 }

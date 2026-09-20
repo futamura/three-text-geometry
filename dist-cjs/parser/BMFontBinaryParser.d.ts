@@ -1,4 +1,4 @@
-import { BMFont, IBMFontParser } from '../types';
+import { BMFont, IBMFontParser } from '../types/index.js';
 declare class BMFontBinaryParser implements IBMFontParser<Uint8Array | ArrayBuffer> {
     private static HEADER;
     parse(data: Uint8Array | ArrayBuffer): BMFont;
