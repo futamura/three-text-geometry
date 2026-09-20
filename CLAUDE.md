@@ -199,6 +199,10 @@ autoRotate` keeps the camera moving. Three things to know:
   --use-angle=swiftshader` makes it work. With no flags at all `WebGPURenderer` falls back to WebGL,
   which renders the ordinary scenes but not `/shader` and `/shuffleshader` — their material comes
   from `wgslFn`, and raw WGSL cannot compile there.
+- **`e2e/` runs as ESM.** The package is `"type": "module"` since 6.0.0, so Playwright loads these
+  files as modules and `__dirname` is not defined — `helpers.ts` resolves `FONTS` from
+  `import.meta.url` instead. A `__dirname` added back here fails only in `demo-smoke`, not in `pnpm
+  test`, since Jest still compiles `tests/` to CommonJS.
 - **Fonts come from `tests/fonts` through `page.route`,** not from the `raw.githubusercontent.com`
   URLs the scenes carry, so the run is offline and tests the checkout. `fulfill`, not `continue` —
   Playwright refuses to redirect a request to another protocol.
