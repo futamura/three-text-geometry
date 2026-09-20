@@ -1,4 +1,4 @@
-import { BMFont } from '../types';
+import { BMFont } from '../types/index.js';
 export interface IBMFontParser<T> {
     parse(data: T): BMFont;
 }

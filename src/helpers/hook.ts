@@ -2,8 +2,8 @@ import { useRef } from 'react';
 import useSWR from 'swr';
 import { Texture } from 'three';
 
-import { BMFont } from '../types';
-import { download, loadTexture, parseFont } from './loader';
+import { BMFont } from '../types/index.js';
+import { download, loadTexture, parseFont } from './loader.js';
 
 interface FontProgressCallback {
   (loaded: number, total: number, percent: number): void;

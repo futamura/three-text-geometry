@@ -1,4 +1,4 @@
-// import { TextGeometryOption } from './TextLayout';
+// import { TextGeometryOption } from './TextLayout.js';
 
 /**
  * The function for computing word metrics.

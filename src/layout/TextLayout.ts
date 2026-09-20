@@ -1,5 +1,5 @@
-import { WordWrap } from '../layout';
-import { BMFont, BMFontChar, TextAlign, TextGlyph, TextLayoutOption, WordMetrics } from '../types';
+import { WordWrap } from '../layout/index.js';
+import { BMFont, BMFontChar, TextAlign, TextGlyph, TextLayoutOption, WordMetrics } from '../types/index.js';
 
 /**
  * Class representing the layout of text using a bitmap font.

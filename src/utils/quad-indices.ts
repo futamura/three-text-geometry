@@ -1,4 +1,4 @@
-import { dtype } from '../utils';
+import { dtype } from '../utils/index.js';
 
 /**
  * The interface to define options for `createIndices`.

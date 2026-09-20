@@ -1,1 +1,1 @@
-{"version":3,"file":"dist-esm/helpers/fiber.js.map","sources":["../../src/helpers/fiber.ts"],"names":["extend","TextGeometry"],"mappings":"OAASA,MAAgD,KAApB,4BAE9BC,iBAAkB,kBAGzBD,OAAO,CAAEC,aAAcA,YAAY,CAAE"}
+{"version":3,"file":"dist-esm/helpers/fiber.js.map","sources":["../../src/helpers/fiber.ts"],"names":["extend","TextGeometry"],"mappings":"OAASA,MAAgD,KAApB,4BAE9BC,iBAAkB,qBAGzBD,OAAO,CAAEC,aAAcA,YAAY,CAAE"}

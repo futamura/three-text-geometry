@@ -1,6 +1,6 @@
 import { extend, ThreeElement } from '@react-three/fiber';
 
-import TextGeometry from '../TextGeometry';
+import TextGeometry from '../TextGeometry.js';
 
 /* Register TextGeometry with R3F catalog on import */
 extend({ TextGeometry: TextGeometry });

@@ -1,4 +1,4 @@
-import { BMFont } from '../types';
+import { BMFont } from '../types/index.js';
 
 /**
  * The interface for the BMFont parser.

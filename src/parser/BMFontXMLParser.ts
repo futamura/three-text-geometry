@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
 
-import { BMFontError } from '../error';
-import { BMFont, BMFontChar, BMFontCommon, BMFontInfo, BMFontKern, DefaultBMFontDistanceField, IBMFontParser } from '../types';
+import { BMFontError } from '../error/index.js';
+import { BMFont, BMFontChar, BMFontCommon, BMFontInfo, BMFontKern, DefaultBMFontDistanceField, IBMFontParser } from '../types/index.js';
 
 /**
  * Reads a list that fast-xml-parser leaves unwrapped when it holds a single element, and that is

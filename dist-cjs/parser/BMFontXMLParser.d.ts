@@ -1,4 +1,4 @@
-import { BMFont, IBMFontParser } from '../types';
+import { BMFont, IBMFontParser } from '../types/index.js';
 declare class BMFontXMLParser implements IBMFontParser<string> {
     parse(xml: string): BMFont;
 }

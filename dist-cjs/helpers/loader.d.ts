@@ -1,5 +1,5 @@
 import { Texture } from 'three';
-import { BMFont } from '../types';
+import { BMFont } from '../types/index.js';
 type DownloadProgressHandler = (loaded: number, total: number) => void;
 declare function download(url: string, onProgress: DownloadProgressHandler): Promise<{
     bytes: Uint8Array;
