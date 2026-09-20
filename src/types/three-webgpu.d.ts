@@ -1,10 +1,10 @@
 /**
  * Ambient module declarations for Three.js WebGPU and TSL subpath imports.
  *
- * These are needed because tsconfig.cjs.json uses moduleResolution: "node"
- * which does not support package.json exports field. The ESM build uses
- * moduleResolution: "bundler" which resolves these natively; these
- * declarations are harmless there (native resolution takes precedence).
+ * These are needed because tsconfig.json - the config Jest and the editor use -
+ * leaves moduleResolution at node10, which does not read a package.json exports
+ * field. The build uses moduleResolution: "nodenext" and resolves these
+ * natively; the declarations are harmless there (native resolution wins).
  *
  * @module three-webgpu
  */

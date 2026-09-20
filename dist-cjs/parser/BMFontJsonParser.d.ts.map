@@ -1,1 +1,0 @@
-{"version":3,"file":"BMFontJsonParser.d.ts","sourceRoot":"","sources":["../../src/parser/BMFontJsonParser.ts"],"names":[],"mappings":"AAGA,OAAO,EAAE,MAAM,EAAqF,aAAa,EAAE,MAAM,mBAAmB,CAAC;AAuB7I,cAAM,gBAAiB,YAAW,aAAa,CAAC,MAAM,GAAG,MAAM,CAAC;IAgBvD,KAAK,CAAC,IAAI,EAAE,MAAM,GAAG,MAAM,GAAG,MAAM;CAoB5C;AAED,OAAO,EAAE,gBAAgB,EAAE,CAAC"}

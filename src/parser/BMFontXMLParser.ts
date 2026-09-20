@@ -2,6 +2,7 @@ import { XMLParser } from 'fast-xml-parser';
 
 import { BMFontError } from '../error/index.js';
 import { BMFont, BMFontChar, BMFontCommon, BMFontInfo, BMFontKern, DefaultBMFontDistanceField, IBMFontParser } from '../types/index.js';
+import { normalizeCharset } from './charset.js';
 
 /**
  * Reads a list that fast-xml-parser leaves unwrapped when it holds a single element, and that is
@@ -82,7 +83,7 @@ class BMFontXMLParser implements IBMFontParser<string> {
         size: +font.info.size || 0,
         bold: +font.info.bold || 0,
         italic: +font.info.italic || 0,
-        charset: font.info.charset.split(',').filter((element: any) => element != ''),
+        charset: normalizeCharset(font.info.charset),
         unicode: +font.info.unicode || 0,
         stretchH: +font.info.stretchH || 0,
         smooth: +font.info.smooth || 0,

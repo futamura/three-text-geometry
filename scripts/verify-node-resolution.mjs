@@ -10,13 +10,20 @@
  * anyway, so neither Jest (which compiles src) nor verify-tree-shaking (which
  * bundles with esbuild) can see it. Only Node's own resolver can.
  *
+ * `moduleResolution: "nodenext"` now rejects a missing extension at compile
+ * time, but the dist is committed rather than built at release, so the checks
+ * below are what prove the *published* files load.
+ *
  * Three checks, in order of how early they catch a regression:
  *
  *   1. Every relative specifier in dist-esm carries a file extension. This
  *      covers modules no entry point reaches, which the probes below cannot.
  *   2. `import 'three-text-geometry'` and `import 'three-text-geometry/tsl'`
  *      load in a real Node process and expose what they should.
- *   3. `require` of both entry points does the same for dist-cjs.
+ *   3. `require` of both entry points does the same. Since 6.0.0 there is no
+ *      CommonJS build, so this is `require(esm)` - supported from Node 22.12,
+ *      and the reason this package can drop dist-cjs without cutting off CJS
+ *      callers. It fails the moment anything introduces a top-level await.
  *
  * The probes run in a scratch directory that links the repo in as a dependency,
  * so `exports` is what resolves the entry points, not a relative path. Node
@@ -93,7 +100,7 @@ const probes = [
     ].join('\n'),
   },
   {
-    name: `require('${pkg.name}') and require('${pkg.name}/tsl') load in Node`,
+    name: `require('${pkg.name}') and require('${pkg.name}/tsl') load in Node through require(esm)`,
     file: 'probe.cjs',
     source: [
       `const TextGeometry = require('${pkg.name}');`,
@@ -139,6 +146,6 @@ try {
 }
 
 if (failed > 0) {
-  console.error(`\n${failed} check(s) failed. If src changed, rebuild and commit dist-cjs / dist-esm: npm publishes them as committed.`)
+  console.error(`\n${failed} check(s) failed. If src changed, rebuild and commit dist-esm: npm publishes it as committed.`)
   process.exit(1)
 }
