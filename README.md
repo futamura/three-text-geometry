@@ -12,14 +12,14 @@
 The port of the JavaScript versions of [three-bmfont-text](https://github.com/Jam3/three-bmfont-text), [layout-bmfont-text](https://github.com/Jam3/layout-bmfont-text), [load-bmfont](https://github.com/Jam3/load-bmfont), and [word-wrapper](https://github.com/mattdesl/word-wrapper) to Pure Typescript, this library enables fast text rendering with Three.js and bitmap font.<br/>
 The difference in rendering speed is noticeable when animations are enabled, and it runs 10x faster than canvas texture based text rendering.
 
-**v4.0** introduces WebGPU support with TSL (Three Shading Language) based node materials that work with both `WebGLRenderer` and `WebGPURenderer`.
+**v6.0** ships as ESM only. The TSL (Three Shading Language) based node materials introduced in v4.0 work with both `WebGLRenderer` and `WebGPURenderer`.
 
 ## Requirements
 
 - Three.js 0.172.0 or later
 - React 19 or later
 - React Three Fiber 9 or later
-- Node.js 22 or later
+- Node.js 22 or later (22.12 or later is required to `require()` the package; `import` works on any Node 22)
 
 ## Installation
 
@@ -211,6 +211,23 @@ const geometry = new TextGeometry('Hello', {
   multipage: true,
 })
 ```
+
+### Migration from v5
+
+v6 makes the package ESM only and normalizes `BMFontInfo.charset`.
+
+**ESM only.** `dist-cjs/` is gone, `package.json` is `"type": "module"`, and `exports` no longer carries a `require` condition. `require('three-text-geometry')` keeps working on Node 22.12 and later through `require(esm)`, but a CommonJS bundler or test runtime that cannot load ESM will now fail. This is the same wall three.js put in front of consumers when r186 made itself ESM-only.
+
+**`BMFontInfo.charset` is `string[]` from every parser.** It was `string | string[]`, so a caller had to branch on the source format: an ASCII `.fnt` gave `"ANSI"`, XML gave `['ANSI']`, binary gave `[]`, and JSON passed through whatever it held. All four are normalized now — an array is kept, a string is read as the comma-separated charset names the BMFont spec describes, and an absent value gives `[]`.
+
+```TypeScript
+// v5
+const names = Array.isArray(font.info.charset) ? font.info.charset : font.info.charset.split(',')
+// v6
+const names = font.info.charset
+```
+
+The JSON schema still accepts both shapes, because it validates the input rather than the parsed result.
 
 ### Migration from v4
 
