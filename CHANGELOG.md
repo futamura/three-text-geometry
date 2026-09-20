@@ -1,3 +1,64 @@
+## [6.0.0](https://github.com/futamura/three-text-geometry/compare/5.0.11...6.0.0) (2026-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* the package is ESM only. `dist-cjs/` is gone, `package.json`
+is `"type": "module"`, and `exports` no longer carries a `require` condition.
+`require('three-text-geometry')` still works on Node 22.12 and later through
+`require(esm)` — `engines` already required Node 22 — but a CommonJS bundler or
+test runtime that cannot load ESM will now fail. That is the same wall three.js
+put in front of consumers when r186 made itself ESM-only; `build/three.cjs` is a
+`require(esm)` shim that three.js says it will remove.
+* `BMFontInfo.charset` is `string[]` from every parser. It was
+`string | string[]`, so a caller had to branch on the source format: an ASCII
+`.fnt` gave `"ANSI"`, XML gave `['ANSI']`, binary gave `[]` and JSON passed
+through whatever it held. `src/parser/charset.ts` now normalizes all four — an
+array is kept, a string is read as the comma-separated charset names the BMFont
+spec describes, and an absent value gives `[]`. The JSON schema still accepts
+both shapes, because it validates the input rather than the parsed result.
+
+Packaging:
+
+- `exports` gains an explicit `types` condition and the manifest gains `types`;
+  neither existed before, and resolution leaned on the adjacent `.d.ts`.
+  `typesVersions` stays for node10 resolution of `./tsl`.
+- `main` and `module` both point at `dist-esm/index.js`, so a node10 resolver
+  still finds the package.
+- `files`, `sideEffects`, the eslint and prettier ignore lists and
+  `package-scripts.sh` lose their `dist-cjs` entries. `build-cjs`, `minify-cjs`
+  and `tsconfig.cjs.json` are gone.
+
+Build:
+
+- `tsconfig.esm.json` moves to `module: NodeNext` / `moduleResolution: nodenext`,
+  which rejects an extensionless relative import at compile time. That mode
+  reads the format from the nearest `package.json` `type`, so it only became
+  usable with `"type": "module"`: measured on 5.0.11's tree it emitted CommonJS
+  into dist-esm, which is why that release shipped `bundler` plus a runtime
+  check instead.
+- `BMFontJsonParser` imports `{ Ajv }` rather than the default. ajv 8 is
+  CommonJS with ESM-shaped types, so under `nodenext` the default import
+  resolves to the module namespace and `new Ajv()` does not typecheck. The named
+  import matches `exports.Ajv` in ajv's own output.
+- `scripts/write-esm-package-type.mjs` and the `dist-esm/package.json` it wrote
+  are removed — the root manifest declares the type now.
+- `verify-tree-shaking` asserts on `dist-esm/index.js` instead of the CJS entry,
+  and `verify-node-resolution`'s `require` probe now exercises `require(esm)`,
+  which is the path CJS callers depend on. Nothing here may introduce a
+  top-level await without breaking it.
+
+Closes #229.
+
+
+Also resolves the e2e font directory from `import.meta.url`: Playwright loads
+`e2e/` as ESM once the package is `"type": "module"`, so `__dirname` is not
+defined there. Jest still compiles `tests/` to CommonJS, so only `demo-smoke`
+saw it.
+
+### Features
+
+* drop the CommonJS build and normalize info.charset ([#229](https://github.com/futamura/three-text-geometry/issues/229)) ([9553aa4](https://github.com/futamura/three-text-geometry/commit/9553aa4ba5775dde324d4f0d994559cf2f05fa21))
+
 ## [5.0.11](https://github.com/futamura/three-text-geometry/compare/5.0.10...5.0.11) (2026-09-20)
 
 ### Bug Fixes
