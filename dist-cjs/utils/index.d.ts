@@ -1,5 +1,0 @@
-export * from './compute.js';
-export * from './vertices.js';
-export * from './binary.js';
-export * from './quad-indices.js';
-//# sourceMappingURL=index.d.ts.map

@@ -1,1 +1,0 @@
-var TextAlign;Object.defineProperty(exports,"__esModule",{value:!0}),exports.TextAlign=void 0,(e=>{e[e.Left=0]="Left",e[e.Center=1]="Center",e[e.Right=2]="Right"})(TextAlign||(exports.TextAlign=TextAlign={}));

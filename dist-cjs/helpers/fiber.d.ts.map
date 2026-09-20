@@ -1,1 +1,0 @@
-{"version":3,"file":"fiber.d.ts","sourceRoot":"","sources":["../../src/helpers/fiber.ts"],"names":[],"mappings":"AAAA,OAAO,EAAU,YAAY,EAAE,MAAM,oBAAoB,CAAC;AAE1D,OAAO,YAAY,MAAM,oBAAoB,CAAC;AAS9C,MAAM,MAAM,iBAAiB,GAAG,YAAY,CAAC,OAAO,YAAY,CAAC,CAAC;AAGlE,OAAO,QAAQ,oBAAoB,CAAC;IAClC,UAAU,aAAa;QACrB,YAAY,EAAE,iBAAiB,CAAC;KACjC;CACF"}

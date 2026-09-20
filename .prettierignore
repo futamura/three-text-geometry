@@ -6,7 +6,6 @@
 *.md
 *.mjs
 coverage
-dist-cjs
 dist-esm
 docs
 jest.config*.ts

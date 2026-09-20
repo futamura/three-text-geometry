@@ -1,7 +1,0 @@
-export * from './BMFont.js';
-export * from './BMFontUtil.js';
-export * from './IBMFontParser.js';
-export * from './TextGeometryOption.js';
-export * from './TextLayout.js';
-export * from './WordWrap.js';
-//# sourceMappingURL=index.d.ts.map

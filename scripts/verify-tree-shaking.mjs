@@ -143,13 +143,13 @@ try {
     }
   }
 
-  /* CommonJS has no tree shaking at all, so the root CJS entry must not reference the materials either. */
-  const cjsIndex = fs.readFileSync(path.join(root, 'dist-cjs', 'index.js'), 'utf8')
-  if (/materials|TextNodeMaterial/.test(cjsIndex)) {
+  /* The scenarios prove a bundler drops the materials; this proves the entry never named them, whatever the bundler does. */
+  const esmIndex = fs.readFileSync(path.join(root, 'dist-esm', 'index.js'), 'utf8')
+  if (/materials|TextNodeMaterial/.test(esmIndex)) {
     failed++
-    console.error('FAIL  dist-cjs/index.js references the TSL materials')
+    console.error('FAIL  dist-esm/index.js references the TSL materials')
   } else {
-    console.log('ok    dist-cjs/index.js does not reference the TSL materials')
+    console.log('ok    dist-esm/index.js does not reference the TSL materials')
   }
 
   /* An import the package does not declare resolves in this repo and breaks in a consumer's install. */
@@ -166,6 +166,6 @@ try {
 }
 
 if (failed > 0) {
-  console.error(`\n${failed} check(s) failed. If src changed, rebuild and commit dist-cjs / dist-esm: npm publishes them as committed.`)
+  console.error(`\n${failed} check(s) failed. If src changed, rebuild and commit dist-esm: npm publishes it as committed.`)
   process.exit(1)
 }
