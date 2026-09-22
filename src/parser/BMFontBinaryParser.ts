@@ -89,7 +89,7 @@ class BMFontBinaryParser implements IBMFontParser<Uint8Array | ArrayBuffer> {
     /** fixedHeight is only mentioned in binary spec */
     if ((bitField >> 3) & 1) info.fixedHeight = 1;
 
-    // info.charset = buf.getUint8(i + 3) || ''; /** TODO: Array? or String? */
+    /** The charset byte (i + 3) is not read, so info.charset stays [] — see charset.ts */
     info.stretchH = buf.getUint16(i + 4, true);
     info.aa = buf.getUint8(i + 6);
     info.padding = [buf.getInt8(i + 7), buf.getInt8(i + 8), buf.getInt8(i + 9), buf.getInt8(i + 10)];
