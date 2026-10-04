@@ -1,3 +1,9 @@
+## [6.0.1](https://github.com/futamura/three-text-geometry/compare/6.0.0...6.0.1) (2026-10-04)
+
+### Bug Fixes
+
+* **deps:** bump fast-uri, undici and markdown-it past their advisories ([#240](https://github.com/futamura/three-text-geometry/issues/240)) ([4b12f1c](https://github.com/futamura/three-text-geometry/commit/4b12f1cffb090ca2757e16b384308784b3e9dc81))
+
 ## [6.0.0](https://github.com/futamura/three-text-geometry/compare/5.0.11...6.0.0) (2026-09-20)
 
 ### ⚠ BREAKING CHANGES
