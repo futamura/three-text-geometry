@@ -306,12 +306,17 @@ The channel itself has been unused since the initial development: the only pre-r
 published are `0.0.1-beta.1` through `.5`, from 2021-12-09 to 2022-02-04. The `beta` dist-tag still
 pointed at `0.0.1-beta.5` until 2026-09-19, which meant `npm install three-text-geometry@beta`
 handed out that 0.0.1 pre-release; it was repointed by hand to the then-current `latest`, 5.0.10.
-The next `beta` release overwrites it.
+6.0.0 left that a major behind `latest` the next day, so on 2026-10-26 the tag was **removed**
+rather than repointed again — a hand-moved tag goes stale with every release. `@beta` now fails to
+resolve instead of handing out an old major, and the next `beta` release creates the tag afresh.
+Do not repoint it to `latest` as housekeeping.
 
 Moving a dist-tag by hand needs a **real terminal**, not a tool-run shell. 2FA on the npm account is
 WebAuthn, so there is no `--otp=<6 digits>` to pass, and the web-OTP fallback blocks on
 `Press ENTER to open in the browser...`; a non-interactive shell cannot answer that and the command
-dies with `EOTP`. `npm login` is the exception — it polls without the prompt.
+dies with `EOTP`. `npm login` is the exception — it polls without the prompt. Publishing goes
+through Trusted Publishing, so the local login is never exercised and expires unnoticed: an
+`E401` from `npm dist-tag` means `npm login` again first.
 
 ### Branch Protection
 
