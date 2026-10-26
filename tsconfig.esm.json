@@ -11,9 +11,6 @@
     "skipLibCheck": true,                                      // Skip type checking of declaration files (@webgpu/types conflicts with TS6 built-in WebGPU types)
     "resolveJsonModule": true,                                 // Enable importing JSON modules <https://www.typescriptlang.org/tsconfig#resolveJsonModule>
     "esModuleInterop": true,                                   // Disable interoperability between CommonJS and ES Modules <https://www.typescriptlang.org/tsconfig#esModuleInterop>
-    /* FIXME: Incremental compilation is broken. Fix `find: dist-esm: No such file or directory` */
-    // "incremental": true,                                       // Enable incremental compilation for better performance <https://www.typescriptlang.org/tsconfig#incremental>
-    // "tsBuildInfoFile": ".cache/esm/.tsbuildinfo",              // Path for TypeScript build information file <https://www.typescriptlang.org/tsconfig#tsBuildInfoFile>
     "sourceMap": true,                                         // Generate source maps for debugging <https://www.typescriptlang.org/tsconfig#sourceMap>
     "declaration": true,                                       // Generate declaration files <https://www.typescriptlang.org/tsconfig#declaration>
     "declarationMap": true,                                    // Generate declaration maps <https://www.typescriptlang.org/tsconfig#declarationMap>
