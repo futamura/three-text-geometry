@@ -1,3 +1,13 @@
+## [6.1.0](https://github.com/futamura/three-text-geometry/compare/6.0.1...6.1.0) (2026-11-18)
+
+### Features
+
+* update three.js to 0.187.0 ([#261](https://github.com/futamura/three-text-geometry/issues/261)) ([74b3374](https://github.com/futamura/three-text-geometry/commit/74b33740a5bc69222d4740262456264af547882c))
+
+### Bug Fixes
+
+* **deps:** raise fast-xml-parser to 5.12 past its stopNodes advisory ([#263](https://github.com/futamura/three-text-geometry/issues/263)) ([b0898c7](https://github.com/futamura/three-text-geometry/commit/b0898c7ad94d206b18d337b061fbd8aec3e46ef5))
+
 ## [6.0.1](https://github.com/futamura/three-text-geometry/compare/6.0.0...6.0.1) (2026-10-04)
 
 ### Bug Fixes
